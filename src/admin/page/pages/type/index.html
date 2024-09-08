@@ -1,0 +1,204 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+<template id="titlebar">
+	<h1>{{ type }}</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">정보</h2>
+	
+	<ui-btn type="simple" icon="add" (click)="편집하기({})">ADD</ui-btn>
+	<ui-btn type="simple" icon="remove" [attr.disabled]="selected == null" (click)="제품삭제하기(selected)">DELETE</ui-btn>
+	
+	<space size="32"></space>
+	
+	<ui-btn-group>
+		<ui-btn type="simple" (click)="상태변경하기(selected, '공개')" [attr.disabled]="selected == null">공개</ui-btn>
+		<ui-btn type="simple" (click)="상태변경하기(selected, '비공개')" [attr.disabled]="selected == null">비공개</ui-btn>
+	</ui-btn-group>
+	
+	<div flex></div>
+	
+	<ui-search (submit)="새로고침()" [(value)]="params.search"></ui-search>
+</template>
+
+
+<template id="sidebar">
+	<section>
+		<h1>게시물</h1>
+		<ul *repeat="['공개', '비공개'] as row">
+			<li menu-1 [attr.selected]="params.status === row" (click)="상태선택하기(row)">{{ row }}
+				<span>({{ count[row] || '0'}})</span></li>
+		</ul>
+	</section>
+	
+	<space size="16"></space>
+	
+	<section>
+		<h1>카테고리</h1>
+		<ul *repeat="config.categories as row">
+			<li menu-1 [attr.selected]="params.tags.has(row)" (click)="카테고리선택하기(row)">{{ row }}
+				<span>({{ count[row] || '0'}})</span></li>
+		</ul>
+	</section>
+	
+	
+	<space size="16"></space>
+	
+	
+	<section [visible]="tags">
+		<h1>태그</h1>
+		<ul *repeat="tags as row">
+			<li menu-1 [attr.selected]="params.tags.has(row)" (click)="카테고리선택하기(row)">{{ row }}
+				<span>({{ count[row] || '0'}})</span></li>
+		</ul>
+	</section>
+</template>
+
+
+<template id="content">
+	<section class="content-wrap">
+		<table>
+			<thead>
+			<tr>
+				<th style="width: 36px"></th>
+				<th style="width: 120px"></th>
+				<th left>제목</th>
+				<th style="width: 100px">날짜</th>
+				<th style="width: 100px">상태</th>
+				<th style="width: 120px">작성일</th>
+			</tr>
+			</thead>
+			
+			<tbody>
+			<tr *repeat="items$.rows as item, index" (click)="선택하기(item)" [attr.selected]="selected === item">
+				<td><i icon="checkbox"></i></td>
+				<td>
+					<div style="width: 110px; height: 48px;" [style.background-image.url]="item.cover.src" contain></div>
+				</td>
+				<td left>
+					<h1><span clickable (click)="편집하기(item)">{{ item.name || '-' }}</span></h1>
+					<p [inner-html]="item.tags.join(', ') | highlight: params.tags.slice() "></p>
+				</td>
+				<td>
+					<div>{{ item.published_at }}</div>
+				</td>
+				<td><span [attr.class]="'status '+item.status">{{ item.status }}</span></td>
+				<td>
+					<div>{{ item.created_at | date:'yyyy-mm-dd' }}</div>
+					<div>{{ item.created_at | date:'hh:ii:ss' }}</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		
+		<space size="12"></space>
+		
+		<ui-pagination [items$]="items$" [params]="params"></ui-pagination>
+	</section>
+</template>
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, url, collection, http) {
+
+	return {
+		init: function() {
+			var urls = url.parse();
+
+			self.type = urls[2];
+			switch (self.type) {
+				case "grafik-people":
+					self.type = "grafik:people:2000";
+					break;
+
+				case "hot-issue":
+					self.type = "hot issue";
+					break;
+			}
+
+			self.store = window.CONFIG;
+
+			self.item = null;
+			self.selected = null;
+			self.popup = null;
+
+			self.params = {
+				type: self.type,
+				tags: [],
+				search: "",
+				page: 0,
+				limit: 25
+			};
+
+			self.items$ = collection("/admin/api/blogs", self.params);
+			return self.새로고침();
+		},
+
+		"새로고침": function() {
+			self.selected = null;
+			self.item = null;
+
+			http.GET("/admin/api/blogs/count", self.params).then((function(res) {
+				self.count = res;
+				self.tags = Object.keys(self.count).filter(function(x) {
+					if (self.store.categories.indexOf(x) >= 0) return false;
+					return x !== "" && x !== "공개" && x !== "비공개"
+				}).sort()
+			}));
+
+			return self.items$.fetch();
+		},
+
+		"페이징이동": function(offset) {
+			self.params.page = Math.max(0, self.params.page + offset);
+			return self.새로고침();
+		},
+
+		"상태선택하기": function(status) {
+			self.params.status = self.params.status === status ? null : status;
+			return self.새로고침();
+		},
+
+		"카테고리선택하기": function(category) {
+			self.params.tags.toggle(category);
+			self.params.tags = self.params.tags.slice();
+			return self.새로고침();
+		},
+
+		"선택하기": function(item) {
+			self.selected = self.selected === item ? null : item;
+		},
+
+		"편집하기": function(item) {
+			var type = url.parse()[2];
+			window.open("/admin/pages/" + type + "/edit" + (item.id ? "#" + item.id : ""));
+
+			window.onfocus = function() {
+				self.items$.fetch();
+				window.onfocus = null;
+			}
+		},
+
+		"상태변경하기": function(item, status) {
+			item.status = status;
+			return self.items$.save(item);
+		},
+
+
+		"제품삭제하기": function(item) {
+			if (confirm("정말 삭제하시겠습니까?")) {
+				return self.items$.remove(item).then(function() {
+					self.selected = null;
+				});
+			}
+		}
+	}
+})
+</script>
+{% endblock %}

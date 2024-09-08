@@ -1,0 +1,71 @@
+{% extends "layout/index" %}
+
+{% block content %}
+{% raw %}
+
+<section title-content>
+	<h1>{{ tag }}</h1>
+</section>
+
+<section initial-content>
+	<video-background-thumbnail *foreach="videos.slice(0,1) as video" [video]="video" inline-template (click)="#SHOW_VIDEO_PLAYER(video)">
+		<template [attr.state]="state" [attr.will-state]="willState">
+			<div initial-content-desc>
+				<div wrap animation-desc>
+					<h1 [class.animation]="t.doAnimation" [style.animation-delay.ms]="t.delay1">{{ video.name }}</h1>
+					<h2 [class.animation]="t.doAnimation" [style.animation-delay.ms]="t.delay2">{{ video.desc }}</h2>
+				</div>
+			</div>
+			<div thumbnail [style.background-image.url]="(video.thumbnail.src && video.thumbnail.src+'=s1920') || video.video_thumbnail"></div>
+			<div loading></div>
+		</template>
+	</video-background-thumbnail>
+</section>
+
+<section grid-works-content>
+	<div works-cell *foreach="videos.slice(1) as video" (click)="#SHOW_VIDEO_PLAYER(video)">
+		<video-background-thumbnail [video]="video" inline-template>
+			<template [attr.state]="state" [attr.will-state]="willState">
+				<div works-cell-desc animation-desc>
+					<h1 [class.animation]="t.doAnimation" [style.animation-delay.ms]="t.delay1">{{ video.name }}</h1>
+					<h2 [class.animation]="t.doAnimation" [style.animation-delay.ms]="t.delay2">{{ video.desc }}</h2>
+				</div>
+				<div thumbnail [style.background-image.url]="(video.thumbnail.src && video.thumbnail.src+'=s1920') || video.video_thumbnail"></div>
+				<div loading></div>
+			</template>
+		</video-background-thumbnail>
+	</div>
+</section>
+
+
+<section video-space>
+	<p>Copyright © plan'it production. All rights reserved.</p>
+</section>
+
+
+<script>
+$module.controller("viewController", function(store, actions) {
+	return class {
+		init() {
+			const [category, tag] = store.urlpath;
+
+			actions.FETCH_TAGS.SUCCESS
+				.tap(tags => {
+					tags = tags[category];
+					const _tags = tags.map(tag => tag.toLowerCase());
+					this.tag = tags[_tags.indexOf(tag)];
+				})
+				.subscribe();
+
+
+			actions.FETCH_VIDEOS({category, tag});
+			this.videos = store.videos;
+		}
+	}
+});
+</script>
+
+
+{% endraw %}
+{% endblock %}
+

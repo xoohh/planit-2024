@@ -1,0 +1,49 @@
+@import core
+@import colors
+
+[blog]
+  font-family: "Futura-MediumItalic", "Apple SD Gothic Neo", "Helvetica Neue", 'dotum', sans-serif;
+  font-weight 400
+  line-height 1.8
+  color #333
+  white-space pre-wrap
+
+  img
+    display block
+    max-width 100%
+    height auto
+
+  > iframe
+  > gp-post-gallery
+    display block
+    width 100%
+    margin 21px 0
+
+  > iframe[data-source]
+  > gp-post-gallery
+    padding 0 32px
+
+  a[href]
+    color $accent
+    text-decoration underline
+
+  a[type]
+    cursor inherit !important
+
+  h1
+  a[type="h1"]
+    display inline
+    color #000
+    text-decoration inherit
+    font-size 22px
+
+  strong
+  a[type="strong"]
+    color #000
+    text-decoration inherit
+    font-weight bold
+
+  em
+  a[type="em"]
+    color inherit
+    text-decoration underline

@@ -1,0 +1,74 @@
+{% extends "layout/index" %}
+
+{% block content %}
+{% raw %}
+
+<section video-player>
+	<section popup player-popup>
+		<div player-media $video></div>
+
+		<!--<div player-title hidden [visible]="show.controls">-->
+			<!--<h1>{{ video.name }}</h1>-->
+			<!--<h2>{{ video.desc }}</h2>-->
+		<!--</div>-->
+
+		<!--<div layer></div>-->
+
+		<!--<div player-controller hidden [visible]="show.controls">-->
+			<!--<div player-btn="play" (click)="vimeo.TOGGLE_PLAY()">-->
+				<!--<div>{{ vimeo.willState || vimeo.state }}</div>-->
+			<!--</div>-->
+			<!--<div player-btn="full-screen" (click)="fullscreen()">-->
+				<!--<div></div>-->
+			<!--</div>-->
+			<!--<div player-btn="close" (click)="close()" hidden [visible]="show.close">-->
+				<!--<div></div>-->
+			<!--</div>-->
+
+			<!--<div player-slider (click)="timechange(event)">-->
+				<!--<div player-slider-bar>-->
+					<!--<div player-slider-active [style.width.%]="vimeo.willPercent || vimeo.percent"></div>-->
+				<!--</div>-->
+			<!--</div>-->
+		<!--</div>-->
+	</section>
+</section>
+
+<script>
+$module.controller("viewController", function(Vimeo$) {
+
+	return class {
+		constructor() {
+			this.show = {
+				controls: true,
+				close: true,
+			}
+		}
+
+		init($) {
+			const vimeo = this.vimeo = new Vimeo$;
+
+			vimeo.SET_ID("355462415");
+
+			vimeo.SET_OPTIONS({
+				// background: true,
+				autoplay: false,
+				autopause: false,
+				loop: true,
+			});
+
+			$`$video`.subscribe(vimeo.SET_ELEMENT);
+		}
+
+		timechange(event) {
+			const rect = event.currentTarget.getBoundingClientRect();
+			const offsetX = event.clientX - rect.left;
+			const percentX = offsetX / rect.width;
+
+			this.vimeo.SET_CURRENT_PERCENT(percentX);
+		}
+	}
+});
+</script>
+{% endraw %}
+{% endblock %}

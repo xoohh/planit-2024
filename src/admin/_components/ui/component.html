@@ -1,0 +1,198 @@
+<web-component name="ui-tool-bar">
+	<template>
+		<ui-tool-bar-inner>
+			<ui-tool-bar-left>
+				<content select="ui-bar-button[left]"></content>
+			</ui-tool-bar-left>
+			<ui-tool-bar-center>
+				<content select="ui-bar-button[middle]"></content>
+			</ui-tool-bar-center>
+			<ui-tool-bar-right>
+				<content select="ui-bar-button[right]"></content>
+			</ui-tool-bar-right>
+		</ui-tool-bar-inner>
+	</template>
+</web-component>
+
+<web-component name="ui-tool-bar-nav">
+	<template>
+		<ui-tool-bar tool-bar-nav>
+			<ui-bar-button middle (click)="홈으로이동하기()">
+				<div><i icon="home"></i>home</div>
+			</ui-bar-button>
+			<ui-bar-button middle (click)="이너프십으로이동하기()" [visible]="account.type == 'enoughship'">
+				<div><i icon="enoughship"></i>enoughship</div>
+				<ui-badge badge="new">1</ui-badge>
+			</ui-bar-button>
+			<ui-bar-button middle bar-button-primary (click)="이너프딜러로이동하기()" [visible]="account.type == 'dealer'">
+				<div><i icon="dealer"></i>enough dealer</div>
+			</ui-bar-button>
+		</ui-tool-bar>
+	</template>
+
+	<script>
+		app.component("ui-tool-bar-nav", function(self, http) {
+			return {
+				init: function() {
+					http.GET("/admin/api/account").then(function(account) {
+						self.account = account;
+					});
+				},
+
+				"홈으로이동하기": function() {
+					return location.href = "/";
+				},
+
+				"이너프십으로이동하기": function() {
+					return modal('enoughship-main-view');
+				},
+
+				"이너프딜러로이동하기": function() {
+					return modal('dealer-main-view');
+				}
+			}
+		});
+	</script>
+</web-component>
+
+<web-component name="ui-search-bar">
+	<template>
+		<ui-search-bar-input>
+			<input type="text" placeholder="검색" [(value)]="value" (input)="input()" (keydown)="keydown(event)"/>
+			<div search-bar-placeholder>
+				<i class="icon icon-search"></i>
+				<span>검색</span>
+			</div>
+		</ui-search-bar-input>
+	</template>
+
+	<script>
+		app.component("ui-search-bar", function(self) {
+			return {
+				init: function() {
+
+				},
+
+				input: function(event) {
+					self.dispatchEvent(new CustomEvent("input"));
+
+					if (self.timer) {
+						clearTimeout(self.timer);
+						self.timer = null;
+					}
+
+					self.timer = setTimeout(function() {
+						self.dispatchEvent(new CustomEvent("search"));
+					}, 500);
+				},
+
+				keydown: function(event) {
+					if (event.keyCode == 13) {
+						self.dispatchEvent(new CustomEvent("search"));
+						if (self.timer) {
+							clearTimeout(self.timer);
+							self.timer = null;
+						}
+					}
+				}
+			}
+		});
+	</script>
+</web-component>
+
+
+<web-component name="ui-image">
+	<template>
+		<ui-image-inner
+				[style.background-image]="'url(' + (src || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') + ')'"
+				[style.width]="width+'px'"
+				[style.height]="height+'px'"
+				></ui-image-inner>
+	</template>
+</web-component>
+
+
+<web-component name="ui-alert">
+	<template>
+		<ui-overlay></ui-overlay>
+
+		<ui-alert-container>
+			<ui-alert-inner>
+				<h1>{{ title }}</h1>
+				<p>{{ message }}</p>
+			</ui-alert-inner>
+
+			<ui-button-group>
+				<ui-button *repeat="buttons as button" (click)="$onButtonClicked(button)">{{button}}</ui-button>
+			</ui-button-group>
+		</ui-alert-container>
+	</template>
+	<script>
+		app.component("ui-alert", function(self) {
+			return {
+				init: function() {
+					self.title = "\u00a0";
+					self.message = "\u00a0";
+				},
+
+				$onButtonClicked: function(button) {
+					return self.resolve(button);
+				},
+
+				close: function() {
+					self.parentNode.removeChild(self);
+				}
+			}
+		});
+
+		app.factory("UIAlert", function() {
+
+			return {
+				alert: function(title, message, buttons) {
+					var e = document.createElement("ui-alert");
+					document.body.appendChild(e);
+					e.title = title;
+					e.message = message;
+					e.buttons = buttons || ["확인"];
+
+					var promise = new Promise(function(resolve) {
+						e.resolve = resolve;
+					});
+
+					promise.then(function(res) {
+						if (res !== false) {
+							e.parentNode.removeChild(e)
+						}
+					});
+
+					return promise;
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+<web-component name="ui-image-upload-button">
+	<template>
+		<label>
+			<input type="file" is="file-upload" accept="image/jpeg,image/png" $input (upload)="upload(event)"/>
+			<content></content>
+		</label>
+	</template>
+
+	<script>
+		app.component("ui-image-upload-button", function(self, touch, http) {
+			return {
+				init: function() {
+					self.$input.multiple = self.hasAttribute("multiple");
+				},
+
+				upload: function(event) {
+					self.value = event.detail.data;
+					self.dispatchEvent(new CustomEvent("input"));
+				}
+			}
+		})
+	</script>
+</web-component>

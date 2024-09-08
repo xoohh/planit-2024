@@ -1,0 +1,168 @@
+@import core
+
+/// Layout
+[hbox]
+  hbox(center)
+
+[hbox="start"]
+  hbox(start)
+
+[hbox="end"]
+  hbox(end)
+
+[hbox="wrap"]
+  hbox(center)
+  flex-wrap wrap
+
+[hbox="bar"]
+  hbox(center)
+
+  > *
+    height 100%;
+
+[vbox]
+  vbox()
+
+[flex]
+  flex()
+
+[layer]
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
+
+[float="left"]
+  float left
+
+[float="right"]
+  flaot right
+
+[button]
+  text-align center
+  hbox(center)
+
+  > *
+    margin auto
+
+[relative]
+  position relative
+
+[guide]
+  outline 1px solid #4f80ff
+
+  *
+    outline 1px solid #4f80ff
+
+[height="100%"]
+  height 100%
+
+for $width in 1200 1024 960 768 360 320
+  {s('[width="%d"]', $width)}
+    width unit($width "px")
+
+  {s('[width="%dc"]', $width)}
+    width unit($width "px")
+    margin auto
+
+space
+  display block
+
+for $i in (0..40)
+  {s('space[size="%d"]', $i)}
+    padding unit($i/ 2 "px")
+
+for $i in (0..30)
+  {s('[offset="%d"]', $i)}
+    margin unit($i "px") 0
+
+for $i in (0..30)
+  {s('[inset="%d"]', $i)}
+    padding-top unit($i "px")
+    padding-bottom unit($i "px")
+
+for $i in (1..12)
+  for $j in (1..$i)
+    {s('[width="%d/%d"]', $j, $i)}
+      width unit($j/$i * 100 "%")
+
+
+/// Text
+for $size in (9..42)
+  {s('[font="%d"]', $size)}
+    $font $size
+
+[nowrap]
+  overflow hidden
+  text-overflow ellipsis
+  white-space nowrap
+
+[pre]
+  white-space pre
+  white-space pre-wrap
+
+[text-left]
+  text-align left
+
+[text-right]
+  text-align right
+
+[text-center]
+  text-align center
+
+[text-justify]
+  text-align justify
+
+[bold]
+  font-weight $bold
+
+[underline]
+  text-decoration underline
+
+[underline="hover"]:hover
+  text-decoration underline
+
+/// Image
+[contain]
+  background-size contain
+  background-position center center
+  background-repeat no-repeat
+
+[cover]
+  background-size cover
+  background-position center center
+  background-repeat no-repeat
+
+/// Base
+[\(click\)]
+[href]
+  cursor pointer
+
+for $i in (1..9)
+  {s('[bg="black-%d"]', $i * 10)}
+    background-color rgba(0, 0, 0, $i/ 10)
+
+for $color in #000 #111 #222 #333 #444 #555 #666 #777 #888 #999 #aaa #bbb #ccc #ddd #eee #fff
+  {s('[color="%s"]', $color)}
+    color $color !important
+
+  {s('[bg="%s"]', $color)}
+    background-color $color !important
+
+ratio($w, $h)
+  &:before
+    content: " "
+    display block
+    padding-top unit($h /$w * 100, "%")
+
+for $ratio in (1 1) (2 1) (2 5) (3 5) (4 3) (16 9)
+  {s('[ratio="%s:%s"]', $ratio[0], $ratio[1])}
+    ratio($ratio[0], $ratio[1])
+
+  {s('[ratio="%s:%s"]', $ratio[1], $ratio[0])}
+    ratio($ratio[0], $ratio[1])
+
+
+[uppercase]
+  text-transform uppercase

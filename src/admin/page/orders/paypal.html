@@ -1,0 +1,409 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+
+
+<template id="titlebar">
+	<h1>orders</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">주문정보</h2>
+	<space flex></space>
+	<ui-search (submit)="새로고침()" [(value)]="params.search"></ui-search>
+</template>
+
+
+<template id="sidebar">
+	<h1>구분</h1>
+	<ul>
+		<li><a href="/admin/orders">전체</a></li>
+		<li><a href="/admin/orders/naver">naver</a></li>
+		<li selected="true"><a href="/admin/orders/paypal">paypal</a></li>
+	</ul>
+
+	<br>
+
+	<h1>상태</h1>
+	<ul>
+		<li menu-1 [attr.selected]="params.payment_status === null" (click)="카테고리선택('payment_status', null)">전체</li>
+		<li menu-1 *repeat="category_orders as c" [attr.selected]="params.payment_status === c" (click)="카테고리선택('payment_status', c)">
+			<span button>{{ c }} ({{ count[c] || '0'}})</span>
+		</li>
+	</ul>
+
+	<br>
+
+	<h1>처리내역</h1>
+	<ul>
+		<li menu-1 [attr.selected]="params.state === null" (click)="카테고리선택('state', null)">전체</li>
+		<li menu-1 *repeat="state_orders as c" [attr.selected]="params.state === c" (click)="카테고리선택('state', c)">
+			<span button>{{ c }} ({{ count[c] || '0'}})</span>
+		</li>
+	</ul>
+</template>
+
+
+<template id="content">
+	<section class="content-wrap">
+		<table>
+			<thead>
+			<tr>
+				<!--<th style="width: 36px"></th>-->
+				<th style="width: 100px">구분</th>
+				<th style="width: 200px" left>주문번호</th>
+				<th left>제품명</th>
+				<th style="width: 140px">주문금액</th>
+				<th style="width: 140px">주문자</th>
+				<th style="width: 140px">상태</th>
+				<th style="width: 140px">처리내역</th>
+				<th style="width: 180px">작성일</th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<tr *repeat="orders$.rows as order, index">
+				<!--<td>{{ index + 1 }}</td>-->
+				<td>{{ order.type }}</td>
+				<td left>
+					<span clickable (click)="상세보기(order)">{{ order.order_id }}</span>
+				</td>
+				<td left>
+					<span clickable (click)="상세보기(order)">
+						<span>[{{ (order.cart[0].product_name || order.cart[0].name) || '-' }}]</span>
+						<span [visible]="order.cart.length > 1"> 외 {{order.cart.length-1}}개</span>
+					</span>
+				</td>
+				<td>
+					<div>{{ order.price | currency: order.currency }}</div>
+				</td>
+				<td>
+					<div>{{ order.buyer.name || order.buyer.email }}</div>
+				</td>
+				<td><span [attr.class]="order.payment_status">{{ order.payment_status }}</span></td>
+				<td><span [attr.class]="'status '+order.state">{{ order.state }}</span></td>
+				<td>{{ Date.format('yyyy-mm-dd hh:ii:ss', order.created_at) }}</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<space size="12"></space>
+
+		<ui-pagination [items$]="orders$" [params]="params"></ui-pagination>
+	</section>
+</template>
+
+
+<template id="주문상세">
+	<header>
+		<div flex></div>
+		<h1>{{order.orderNo}}</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+
+	<section popup-content-wrap>
+		<section>
+			<ui-form>
+				<ui-fields>
+					<h1>주문자 정보</h1>
+
+					<ui-field>
+						<h1>이름</h1>
+						<div>{{order.buyer.name}}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>이메일</h1>
+						<div>{{order.buyer.email || '-' }}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>전화번호</h1>
+						<div>{{order.buyer.tel || '-'}}</div>
+					</ui-field>
+				</ui-fields>
+
+				<ui-fields>
+					<h1>주문 정보</h1>
+
+					<ui-field>
+						<h1>총 금액</h1>
+						<div>{{order.price | currency: order.currency }}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>주문상태</h1>
+						<div><span [attr.class]="'status '+order.payment_status">{{ order.payment_status }}</span></div>
+					</ui-field>
+				</ui-fields>
+
+				<ui-fields>
+					<h1>배송 정보</h1>
+					<ui-field>
+						<h1>이름</h1>
+						<div>{{ order.shipping.name }}</div>
+					</ui-field>
+					<ui-field>
+						<h1>연락처</h1>
+						<div>{{ order.shipping.tel1 }}</div>
+						<div>{{ order.shipping.tel2 }}</div>
+					</ui-field>
+					<ui-field>
+						<h1>주소</h1>
+						<div>{{ order.shipping.base }}
+							{{ order.shipping.detail }}<br>
+							{{ order.shipping.postcode }}
+						</div>
+					</ui-field>
+				</ui-fields>
+
+				<ui-fields *repeat="order.cart as item, index">
+					<h1>주문 제품 {{index+1}}</h1>
+					<!--<ui-field>-->
+					<!--<h1>썸네일</h1>-->
+					<!--<div>-->
+					<!--<div style="width: 120px; height: 40px;" cover [style.background-image.url]="item.thumbnail.src"></div>-->
+					<!--</div>-->
+					<!--</ui-field>-->
+
+					<ui-field>
+						<h1>제품명</h1>
+						<div>{{ item.product_name || item.name }}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>개수</h1>
+						<div>{{ item.quantity }}개</div>
+					</ui-field>
+				</ui-fields>
+			</ui-form>
+		</section>
+	</section>
+
+	<footer>
+		<div flex></div>
+		<ui-btn type="simple" (click)="주문처리하기(order)">{{ order.state === '확인완료' ? '확인중' : '확인완료'}}</ui-btn>
+		<div flex></div>
+	</footer>
+</template>
+
+
+<template id="주문상세-paypal">
+	<header>
+		<div flex></div>
+		<h1>{{order.orderNo}}</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+
+	<section popup-content-wrap>
+		<section>
+			<ui-form>
+				<ui-fields>
+					<h1>주문자 정보</h1>
+
+					<ui-field>
+						<h1>이름</h1>
+						<div>{{order.buyer.name}}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>이메일</h1>
+						<div>{{order.buyer.email || '-' }}</div>
+					</ui-field>
+				</ui-fields>
+
+				<ui-fields>
+					<h1>주문 정보</h1>
+
+					<ui-field>
+						<h1>총 금액</h1>
+						<div>{{order.price | currency: order.currency }}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>주문상태</h1>
+						<div><span [attr.class]="'status '+order.payment_status">{{ order.payment_status }}</span></div>
+					</ui-field>
+				</ui-fields>
+
+				<ui-fields>
+					<h1>배송 정보</h1>
+					<ui-field>
+						<h1>이름</h1>
+						<div>{{ order.shipping.recipient_name }}</div>
+					</ui-field>
+					<ui-field>
+						<h1>주소</h1>
+						{{ [ order.shipping.line1, order.shipping.line2, order.shipping.city, order.shipping.state,
+						order.shipping.postal_code + " " + order.shipping.country_code] | compact | join:', ' }}<br>
+						</div>
+					</ui-field>
+				</ui-fields>
+
+
+				<ui-fields *repeat="order.cart as item, index">
+					<h1>주문 제품 {{index+1}}</h1>
+
+					<ui-field>
+						<h1>제품명</h1>
+						<div>{{ item.product_name || item.name }}</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>개수</h1>
+						<div>{{ item.quantity }}개</div>
+					</ui-field>
+				</ui-fields>
+			</ui-form>
+		</section>
+	</section>
+
+	<footer>
+		<div flex></div>
+		<ui-btn type="simple" (click)="페이팔승인하기(order)" [visible]="order.payment_status === 'UNVERIFIED'">승인요청</ui-btn>
+		<div flex [visible]="order.payment_status === 'UNVERIFIED'"></div>
+		<ui-btn type="simple" (click)="주문처리하기(order)">{{ order.state === '확인완료' ? '확인중' : '확인완료'}}</ui-btn>
+		<div flex></div>
+	</footer>
+</template>
+
+
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, collection, http) {
+
+
+	function parseOrder(row) {
+		try {
+
+			switch (row.type) {
+				case "paypal":
+					return parseOrderPaypal(row);
+				default:
+					return parseOrderNaver(row);
+			}
+
+		} catch (e) {
+
+			console.log(e);
+		}
+	}
+
+	function parseOrderPaypal(row) {
+		row.order_id = row.res.transactions[0].related_resources[0].order.id;
+		row.name = row.res.transactions[0].description;
+		row.buyer = row.res.payer.payer_info;
+		row.buyer.name = row.buyer.first_name + " " + row.buyer.last_name;
+		row.cart = row.res.transactions[0].item_list.items;
+		row.shipping = row.res.payer.payer_info.shipping_address;
+		row.price = row.res.transactions[0].amount.total;
+		row.currency = row.res.transactions[0].amount.currency;
+		return row;
+	}
+
+	function parseOrderNaver(row) {
+		row.type = "naver";
+		row.order_id = row.id;
+		row.name = row.res.response[0].product_name;
+		row.buyer = row.res.response[0].orderer;
+		row.cart = row.res.response;
+		row.shipping = row.res.response[0].shipping_address;
+		row.price = row.payments.response.amount;
+		row.currency = "KRW";
+		return row;
+	}
+
+	return {
+		init: function() {
+			self.category_orders = ["VERIFIED", "UNVERIFIED"];
+			self.state_orders = ["확인전", "확인완료"];
+
+			self.params = {
+				type: "paypal",
+				search: "",
+				page: 0,
+				limit: 25
+			};
+
+			self.orders$ = collection("/admin/api/orders", self.params);
+
+			self.$watch("orders$.rows", function() {
+				foreach(self.orders$.rows, parseOrder);
+			});
+
+			return self.새로고침();
+		},
+
+		"카테고리선택": function(prop, status) {
+			self.params[prop] = status;
+			self.params.search = null;
+			return self.새로고침();
+		},
+
+		"새로고침": function() {
+			self.selected = null;
+			http.GET("/admin/api/orders/count").then(function(res) {
+				self.count = res;
+			});
+
+			return self.orders$.fetch();
+		},
+
+		"선택하기": function(order) {
+			self.selected = self.selected === order ? null : order;
+		},
+
+		"상세보기": function(order) {
+			self.order = Object.clone(order);
+			self.popup = self.order.type === "paypal" ? "주문상세-paypal" : "주문상세";
+		},
+
+		"팝업닫기": function() {
+			self.popup = null;
+		},
+
+
+		/// 페이팔
+		"페이팔승인하기": function(order) {
+			return http.POST("/api/paypal/orders", order.id, "authorize", {}).then(function(res) {
+				alert("페이팔 결제 승인 요청하였습니다.");
+			});
+		},
+
+		"주문처리하기": function(order) {
+			var state = order.state === '확인완료' ? '확인중' : '확인완료';
+			return http.PUT("/admin/api/orders", order.id, state).then(function(res) {
+				self.팝업닫기();
+				return self.새로고침();
+			});
+		},
+
+		"주문삭제하기": function(order) {
+
+			if (!confirm("정말로 삭제하시겠습니까?")) {
+				return;
+			}
+
+			return http.DELETE("/admin/api/orders", order.id).then(function(res) {
+
+				console.log(res);
+
+				alert("삭제하였습니다.");
+				self.팝업닫기();
+				return self.새로고침();
+			});
+		}
+
+
+	}
+});
+</script>
+{% endblock %}
+

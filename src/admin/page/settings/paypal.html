@@ -1,0 +1,113 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+
+<style>
+    #shipping-charges input {
+        border: 1px solid #ccc;
+        width: 100px;
+        text-align: center;
+        border-radius: 4px;
+        padding: 4px;
+    }
+</style>
+
+
+<template id="titlebar">
+    <h1>Settings</h1>
+</template>
+
+
+<template id="toolbar">
+    <h2 class="menu-title-sub">Paypal</h2>
+    <ui-btn type="simple" icon="save" (click)="저장하기()">SAVE</ui-btn>
+</template>
+
+
+<template id="sidebar">
+	<ul>
+		<li><a href="/admin/settings/configs">메뉴</a></li>
+		<li><a href="/admin/settings/tags">태그</a></li>
+		<li selected="true"><a href="/admin/settings/paypal">페이팔</a></li>
+	</ul>
+</template>
+
+
+<template id="content">
+    <section class="content-wrap" style="width: 800px">
+        <ui-form>
+
+            <ui-fields>
+                <h1>페이팔</h1>
+                <ui-field>
+                    <h1>환율</h1>
+                    <input type="text" [(value)]="config.USD_RATIO" placeholder="환율을 입력하세요.">
+                </ui-field>
+
+
+                <ui-field>
+                    <h1>배송비 {{ config.shipping_charges }}</h1>
+                    <table id="shipping-charges" style="margin-bottom: 16px">
+                        <tr>
+                            <th style="width: 170px">비용</th>
+                            <th></th>
+                            <th colspan="3">가격범위</th>
+                        </tr>
+                        <tr *repeat="config.shipping_charges as row, index">
+                            <td>
+                                <div hbox>
+                                    <div>$</div>
+                                    <space size="5"></space>
+                                    <input type="text" [(value)]="config.shipping_charges[index]"/>
+                                    <space size="5"></space>
+                                    <div>USD</div>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td>{{ shipping_table[index][0] }}</td>
+                            <td style="width: 40px">~</td>
+                            <td>{{ shipping_table[index][1] }}</td>
+                        </tr>
+                    </table>
+                </ui-field>
+
+            </ui-fields>
+        </ui-form>
+    </section>
+</template>
+{% endraw %}
+{% endblock %}
+
+
+
+{% block script %}
+<script>module.component("viewController", function (self, collection, http) {
+
+    return {
+        init: function () {
+            self.store = {};
+
+            self.shipping_table = [
+                ["$0.01 USD", "$9.99 USD"],
+                ["$10.00 USD", "$49.99 USD"],
+                ["$50.00 USD", "$99.99 USD"],
+                ["$100.00 USD", "$199.99 USD"],
+                ["$200.00 USD", "이상"],
+            ];
+
+            http.GET("/admin/api/configs/config").then(function (res) {
+                self.store = res;
+                self.store.shipping_charges = self.store.shipping_charges || [0,0,0,0,0];
+            });
+        },
+
+        "저장하기": function () {
+            return http.PUT("/admin/api/configs/config", {value: self.store}).then(function (res) {
+                alert("저장되었습니다.");
+            });
+        }
+    }
+})
+</script>
+{% endblock %}

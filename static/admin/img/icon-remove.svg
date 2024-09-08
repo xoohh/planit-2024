@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="2px" viewBox="0 0 14 2" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-remove</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="tablet" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="source" transform="translate(-5.000000, -93.000000)">
+            <g id="icon-remove" transform="translate(0.000000, 82.000000)">
+                <polygon id="Bounds" points="0 0 24 0 24 24 0 24"></polygon>
+                <polygon id="Icon" fill="#000000" points="19 13 5 13 5 11 19 11"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,65 @@
+{% extends "layout/index" %}
+
+{% block content %}
+{% raw %}
+<space size-header></space>
+
+<section grid-blog-content>
+	<div post grid-masonry *foreach="blogs as blog">
+		<h1 title-bar="stress">
+			<div title>{{ blog.name }}</div>
+		</h1>
+		<div post-img hidden [visible]="blog.cover.src"><img [src]="blog.cover.src + '=s1024'"/></div>
+		<div post-desc blog>{{ html(blog.body) }}</div>
+	</div>
+</section>
+
+
+<script>
+$module.directive("grid-masonry", function() {
+
+	function fitHeight(el) {
+		let height = el.lastElementChild.getBoundingClientRect().bottom - el.firstElementChild.getBoundingClientRect().top;
+		el.style.gridRowEnd = "span " + Math.round(height / 50);
+	}
+
+	return function(context, el) {
+		const myFitHeight = fitHeight.bind(null, el);
+
+		myFitHeight();
+		setInterval(myFitHeight, 500);
+	}
+});
+
+
+$module.controller("viewController", function(actions, store) {
+
+	return class {
+		init() {
+			this.store = store;
+			this.blogs = this.store.blogs;
+
+			actions.FETCH_BLOGS();
+		}
+
+		/// @FIXME: PIPE..
+		html(body) {
+			const img_reg = /<img [^>]*>/g;
+			body = body.replace(img_reg, (a) => "</p>" + a + "<p>").replace(/<p><\/p>/g, "");
+			body = "<p>" + body + "</p>";
+
+			let template = document.createElement("template");
+			template.innerHTML = body;
+
+			Array.from(template.content.querySelectorAll("img")).forEach(img => {
+				img.src += "=s1024";
+			});
+
+			return template.content;
+		}
+	}
+});
+</script>
+
+{% endraw %}
+{% endblock %}

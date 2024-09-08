@@ -1,0 +1,307 @@
+{% extends "layout/base" %}
+
+{% block body %}
+{% raw %}
+<header [attr.accent]="!!store.nav">
+	<section bg hidden [visible]="!!store.nav" animation="fade"></section>
+	<div wrap>
+		<section logo><a href="/"></a></section>
+		<nav nav-header>
+			<a _href="/works" (click)="#메뉴선택('works')">works</a>
+			<a _href="/directors" (click)="#메뉴선택('directors')">directors</a>
+			<a _href="/plan-v" dt-only (click)="#메뉴선택('plan_v')">plan v</a>
+			<a href="/blog" dt-only>blog</a>
+			<a _href="/about" dt-only (click)="#메뉴선택('about')">about</a>
+			<a _href="/contact" (click)="#메뉴선택('contact')">contact</a>
+		</nav>
+	</div>
+</header>
+
+<!-- NAV-WORKS -->
+<nav popup nav-popup hidden [visible]="store.nav === 'works'" animation="fade">
+	<a *foreach="store.tags.works as tag, index" [href]="'/works/' + tag.toLowerCase()" [attr.id]="index">
+		<div>{{ tag }}</div>
+	</a>
+	<a href="http://archive.planit-production.com/" target="_blank" [attr.id]="index">
+		<div>Archive</div>
+	</a>
+</nav>
+
+
+<nav popup nav-popup hidden [visible]="store.nav === 'directors'" animation="fade">
+	<a *foreach="store.tags.directors as tag, index" [href]="'/directors/' + tag.toLowerCase()" [attr.id]="index">
+		<div>{{ tag }}</div>
+	</a>
+</nav>
+
+
+<nav popup nav-popup hidden [visible]="store.nav === 'plan_v'" animation="fade">
+	<a *foreach="store.tags['plan v'] as tag, index" [href]="'/plan-v/' + tag.toLowerCase()" [attr.id]="index">
+		<div>{{ tag }}</div>
+	</a>
+</nav>
+
+
+<section popup contact-popup hidden [visible]="store.nav === 'about'" animation="fade">
+	<section about-content>
+		<h1 title-bar>
+			<div title>IT</div>
+		</h1>
+		<div about-wrap>
+			<div about-desc>
+				“IT” is actually something that everyone has.<br>
+				But “IT” is difficult to put in order and also to show off.<br>
+				<br>
+				Nevertheless “IT” will greatly evolve when “IT” gathers together.<br>
+				<br>
+				When “IT” is actually materialized,<br>
+				“IT” will gain great power to change the entire world.<br>
+				<br>
+				“IT” is the “IDEA”<br>
+				<br>
+				PLAN IT draws out ideas that reach to the hearts.<br>
+				<br>
+				PLAN IT will be a shortcut to PLAN your “IT”<br>
+			</div>
+
+			<div about-desc>
+				With more than a decade of experience,<br>
+				Planit Production has established itself to be a high quality, highly efficient, and highly creative production company in South Korea and now we also run TAIYOU prooduction at Shanghai, China.<br>
+				<br>
+				We specialize in producing innovative, original, and groundbreaking contents in any genre for the biggest and most established international agencies, creative partners, and brands.<br>
+				<br>
+				Our professional and meticulous producers and the most inventive and dedicated directors and scenario writers, are all in tune with the digital convergence era.<br>
+				<br>
+				Working with our global company will guarantee you superior, intelligent contents, whilst providing you with the best possible service, knowledge and experience.<br>
+			</div>
+		</div>
+
+		<div about-desc style="text-align:center;">
+			download company credential document <a text-link href="" target="">here</a>
+		</div>
+	</section>
+
+	<section award-content>
+		<h1 title-bar>
+			<div title>AWARD</div>
+		</h1>
+		<div award-list>
+			<div award="1">
+				<div aw-logo></div>
+				<h1>X 5</h1>
+			</div>
+			<div award="2">
+				<div aw-logo></div>
+				<h1>X 26</h1>
+			</div>
+			<div award="3">
+				<div aw-logo></div>
+				<h1>X 25</h1>
+			</div>
+			<div award="4">
+				<div aw-logo></div>
+				<h1>X 4</h1>
+			</div>
+			<div award="5">
+				<div aw-logo></div>
+				<h1>X 5</h1>
+			</div>
+			<div award="6">
+				<div aw-logo></div>
+				<h1>X 25</h1>
+			</div>
+			<div award="7">
+				<div aw-logo></div>
+				<h1>X 18</h1>
+			</div>
+			<div award="8">
+				<div aw-logo></div>
+				<h1>X 13</h1>
+			</div>
+			<div award="9">
+				<div aw-logo></div>
+				<h1>X 2</h1>
+			</div>
+			<div award="">
+				<div aw-logo></div>
+				<h1></h1>
+			</div>
+		</div>
+		
+	</section>
+</section>
+
+
+<!-- CONTACT -->
+<section popup contact-popup hidden [visible]="store.nav === 'contact'" animation="fade">
+	<section initial-contact-content>
+		<h1 title-bar>
+			<div title>Contact</div>
+		</h1>
+		<div contact-desc>
+			<a text-link href="https://www.instagram.com/planit_production_official" target="_blank">instagram</a><br>
+			<a text-link href="https://vimeo.com/planitproduction" target="_blank">vimeo</a><br>
+			<a text-link href="https://www.facebook.com/PLANIT.PD/" target="_blank">facebook</a><br>
+			<br>
+			15 EONJU-RO 133-GIL<br>
+			GANGNAM-GU, SEOUL, SOUTH KOREA<br>
+			TEL.+82-2-512-2521<br>
+			FAX.+82-2-514-1165<br>
+		</div>
+	</section>
+
+	<section>
+		<div initial-contact-content>
+			<h1 title-bar>
+				<div title>Email</div>
+			</h1>
+			<div contact-desc>
+				<a text-link href="mailto:cmplanit.global@gmail.com">cmplanit.global@gmail.com</a><br>
+			</div>
+		</div>
+
+		<!-- mobile only -->
+		<div initial-contact-content m-only>
+			<h1 title-bar>
+				<div title>Global Team</div>
+			</h1>
+			<div contact-desc>
+				JOON PARK / GLOBAL<br>
+				+82-10-4283-1883<br>
+				<br>
+				SOO RYU KANG / GLOBAL<br>
+				+82-10-8731-4687<br>
+				<br>
+				MOON JUNG / CHINA<br>
+				TAIYOU Shanghai<br>
+				+86-152-5014-4008<br>
+			</div>
+			
+			<h1 title-bar>
+				<div title>Seoul Team</div>
+			</h1>
+			<div contact-desc>
+				LIM, JI YOUNG / CEO & Managing Director<br>
+				<br>
+				CHA, CHOONG WOON / Managing Director<br>
+				+82-10-6348-2876<br>
+				<br>
+				KIM, HYUNG KYUN / Executive Producer<br>
+				+82-10-8950-0357<br>
+				<br>
+				CHA, YU HYUN / Executive Producer<br>
+				+82-10-3290-9704<br>
+				<br>
+				JUNG, SUNG WON / Executive Producer<br>
+				+82-10-3189-9227<br>
+				<br>
+				CHOI, MIN PYO / Executive Producer<br>
+				+82-10-4670-5670<br>
+				<br>
+				JEONG, JUNG HWA / Executive Producer<br>
+				+82-10-6402-0310<br>
+				<br>
+				CHOI, KWANG SUB / Head of Production<br>
+				+82-10-2442-1985<br>
+				<br>
+			</div>
+
+			<space size="30"></space>
+			<space size="30"></space>
+
+		</div>
+
+		<space size="30"></space>
+		<space size="30"></space>
+
+	</section>
+
+	<!-- desktop only -->
+	<section contact-grid-content dt-only>
+		<h1 title-bar>
+			<div wrap>
+				<div title>Global Team</div>
+				<div title>Seoul Team</div>
+			</div>
+		</h1>
+
+		<div contact-desc-wrap>
+			<div contact-desc>
+				JOON PARK / GLOBAL<br>
+				+82-10-4283-1883<br>
+				<br>
+				SOO RYU KANG / GLOBAL<br>
+				+82-10-8731-4687<br>
+				<br>
+				MOON JUNG / CHINA<br>
+				TAIYOU Shanghai<br>
+				+86-152-5014-4008<br>
+			</div>
+			
+			<div contact-desc>
+				LIM, JI YOUNG / CEO & Managing Director<br>
+				<br>
+				CHA, CHOONG WOON / Managing Director<br>
+				+82-10-6348-2876<br>
+				<br>
+				KIM, HYUNG KYUN / Executive Producer<br>
+				+82-10-8950-0357<br>
+				<br>
+				CHA, YU HYUN / Executive Producer<br>
+				+82-10-3290-9704<br>
+				<br>
+				JUNG, SUNG WON / Executive Producer<br>
+				+82-10-3189-9227<br>
+				<br>
+				CHOI, MIN PYO / Executive Producer<br>
+				+82-10-4670-5670<br>
+				<br>
+				JEONG, JUNG HWA / Executive Producer<br>
+				+82-10-6402-0310<br>
+				<br>
+				CHOI, KWANG SUB / Head of Production<br>
+				+82-10-2442-1985<br>
+				<br>
+			</div>
+		</div>
+	</section>
+</section>
+{% endraw %}
+
+<main is="viewController" inline-template>
+	{% if this.allowed %} {% block content %}{% endblock %}
+	{% elif account %} {% block content_deny %}{% endblock %}
+	{% else %} {% block content_deny_guest %}{% endblock %}
+	{% endif %}
+</main>
+
+<footer hidden [visible]="!!store.nav" animation="fade">
+	<nav nav-footer>
+		<a (click)="#메뉴선택('about')">about</a>
+		<a href="/blog">blog</a>
+		<a (click)="#메뉴선택('plan_v')">plan v</a>
+	</nav>
+
+	<div class="copyright">
+		<div>Copyright © plan’it production Inc. All rights reserved.</div>
+	</div>
+</footer>
+
+
+<script>
+$module.controller("rootController", function(store, actions) {
+
+	return class {
+		init() {
+			this.store = store;
+			window.store = store;
+
+			store.nav.subscribe(value => this.nav = value);
+
+			actions.FETCH_TAGS();
+		}
+	}
+});
+</script>
+
+{% endblock %}

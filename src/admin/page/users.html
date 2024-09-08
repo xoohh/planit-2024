@@ -1,0 +1,190 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+
+<template id="titlebar">
+	<h1>Admin</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">관리자정보</h2>
+
+	<ui-btn type="simple" icon="add" (click)="편집하기({})">ADD</ui-btn>
+	<ui-btn type="simple" icon="remove" (click)="회원삭제하기(selected)" [attr.disabled]="selected === null">DELETE</ui-btn>
+</template>
+
+
+<template id="sidebar">
+</template>
+
+
+<template id="content">
+	<section class="content-wrap">
+		<table>
+			<thead>
+			<tr>
+				<th style="width: 36px">#</th>
+				<th style="width: 240px">이메일(ID)</th>
+				<th></th>
+				<th style="width: 240px">등록일</th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<tr *repeat="users$.rows as user, index" (click)="선택하기(user)" [attr.selected]="selected === user" [visible]="user.email !== '1px'">
+				<td><i icon="checkbox"></i></td>
+				<td>
+					<h1><span clickable (click)="편집하기(user)">{{ user.email || '-' }}</span></h1>
+				</td>
+				<td></td>
+				<td>{{ Date.format('yyyy-mm-dd', user.created_at) }}</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<space size="12"></space>
+
+		<ui-pagination [items$]="users$" [params]="params"></ui-pagination>
+	</section>
+</template>
+
+
+<template id="회원편집">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>EDIT MODE</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+
+	<section popup-content-wrap>
+		<section>
+			<ui-form>
+				<ui-fields>
+					<h1>관리자 정보</h1>
+
+					<ui-field>
+						<h1>이메일(ID)</h1>
+						<input type="text" [(value)]="user.email"/>
+					</ui-field>
+
+					<ui-field>
+						<h1>비밀번호</h1>
+						<input type="text" [(value)]="user.password"/>
+					</ui-field>
+				</ui-fields>
+			</ui-form>
+		</section>
+	</section>
+
+	<footer>
+		<ui-btn type="simple" icon="save" (click)="저장하기(user)">SAVE</ui-btn>
+	</footer>
+</template>
+{% endraw %}
+
+
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, collection) {
+	return {
+		init: function() {
+			self.user = null;
+			self.homepage = null;
+			self.popup = null;
+
+			self.selected = null;
+
+			self.params = {
+				type: null,
+				category: null,
+				search: "",
+				page: 0,
+				limit: 25
+			};
+
+			self.users$ = collection("/admin/api/users", self.params);
+			self.새로고침();
+		},
+
+		"새로고침": function() {
+			self.selected = null;
+			self.user = null;
+			return self.users$.fetch();
+		},
+
+		"카테고리선택하기": function(type) {
+			self.params.type = type;
+			return self.users$.fetch();
+		},
+
+		"분류선택하기": function(type) {
+			self.params.category = type;
+			return self.users$.fetch();
+		},
+
+
+		"선택하기": function(user) {
+			self.selected = self.selected === user ? null : user;
+		},
+
+		"편집하기": function(user) {
+			self.user = Object.clone(user);
+			self.user.password = "";
+			self.user.type = "관리자";
+			self.popup = "회원편집";
+		},
+
+		"회원삭제하기": function(user) {
+			if (confirm("정말 삭제하시겠습니까?")) {
+				self.users$.remove(user);
+				self.selected = null;
+			}
+		},
+
+		"회원정지토글하기": function(user) {
+			user = Object.clone(user);
+			user.status = user.status === "회원정지" ? "" : "회원정지";
+			delete user.password;
+			return self.users$.save(user);
+		},
+
+		"저장하기": function(user) {
+			if (!user.password) {
+				delete user.password;
+			}
+
+			return self.users$.save(user).then(function() {
+				self.팝업닫기();
+			});
+		},
+
+		"팝업닫기": function() {
+			self.popup = null;
+		},
+
+
+		"홈페이지편집하기": function(user) {
+			return http.GET("/admin/api/users", user.id, "homepage").then(function(res) {
+				self.homepage = res;
+				self.homepage.user_id = user.id;
+				self.popup = "홈페이지편집";
+			});
+		},
+
+
+		"홈페이지저장하기": function(homepage) {
+			return http.PUT("/admin/api/users", homepage.user_id, "homepage", homepage).then(function(res) {
+				return self.팝업닫기();
+			});
+		}
+
+	}
+})
+</script>
+{% endblock %}

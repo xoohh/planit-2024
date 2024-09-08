@@ -1,0 +1,109 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+<template id="titlebar">
+	<h1>Settings</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">Configs</h2>
+	<ui-btn type="simple" icon="save" (click)="저장하기()">SAVE</ui-btn>
+</template>
+
+
+<template id="sidebar">
+	<ul>
+		<li selected="true"><a href="/admin/settings/configs">메뉴</a></li>
+		<li><a href="/admin/settings/tags">태그</a></li>
+		<li><a href="/admin/settings/paypal">페이팔</a></li>
+	</ul>
+</template>
+
+
+<template id="content">
+	<section class="content-wrap" style="width: 700px">
+		<ui-form>
+			
+			<ui-fields>
+				<h1>로고</h1>
+				<ui-field>
+					<h1>이미지</h1>
+					<ui-image-upload [width]="200px'" contain hbox flex [(value)]="config.logo"></ui-image-upload>
+				</ui-field>
+			</ui-fields>
+
+
+			<ui-fields>
+				<h1>메인노출 (데스크탑)</h1>
+				
+				<ui-field>
+					<h1>main/glasses</h1>
+					<label><input type="checkbox" [(checked)]="config.show_main_glasses"></label>
+				</ui-field>
+				
+				<ui-field>
+					<h1>main/others</h1>
+					<label><input type="checkbox" [(checked)]="config.show_main_others"></label>
+				</ui-field>
+			</ui-fields>
+			
+			
+			<ui-fields>
+				<h1>메인노출 (모바일)</h1>
+				
+				<ui-field>
+					<h1>main/glasses</h1>
+					<label><input type="checkbox" [(checked)]="config.show_main_glasses_mobile"></label>
+				</ui-field>
+				
+				<ui-field>
+					<h1>main/others</h1>
+					<label><input type="checkbox" [(checked)]="config.show_main_others_mobile"></label>
+				</ui-field>
+			</ui-fields>
+			
+			
+			<ui-fields>
+				<h1>메뉴노출</h1>
+				
+				<ui-field>
+					<h1>discount item</h1>
+					<label><input type="checkbox" [(checked)]="config.show_discount_item"></label>
+				</ui-field>
+				
+				<ui-field>
+					<h1>best seller</h1>
+					<label><input type="checkbox" [(checked)]="config.show_best_seller"></label>
+				</ui-field>
+			</ui-fields>
+		
+		</ui-form>
+	</section>
+</template>
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, collection, http) {
+
+	return {
+		init: function() {
+			self.store = {};
+
+			http.GET("/admin/api/configs/config").then(function(res) {
+				self.store = res;
+			});
+		},
+
+		"저장하기": function() {
+			return http.PUT("/admin/api/configs/config", {value: self.store}).then(function(res) {
+				alert("저장되었습니다.");
+			});
+		}
+	}
+})
+</script>
+{% endblock %}

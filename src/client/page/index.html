@@ -1,0 +1,55 @@
+{% extends "layout/index" %}
+
+{% block content %}
+{% raw %}
+
+<section class="video-background-list" full-screen-banner (click)="#SHOW_VIDEO_PLAYER(currentVideo)">
+	<video-background *foreach="videos as video"
+			[video]="video"
+			[state]="video === currentVideo ? 'play' : 'pause'"
+			(played)="t.start()"
+			(ended)="#NEXT_MAIN_VIDEO(); t.stop()"
+			hidden [visible]="video === currentVideo"
+	></video-background>
+
+	<section banner-wrap hidden [visible]="videos.length > 0">
+		<section banner-desc>
+			<div wrap animation-desc>
+				<h1 [class.animation]="t.doAnimation" [style.animation-delay.ms]="t.delay1">{{ currentVideo.name }}</h1>
+				<h2 [class.animation]="t.doAnimation" [style.animation-delay.ms]="t.delay2">{{ currentVideo.desc }}</h2>
+			</div>
+		</section>
+
+		<section banner-indicators>
+			<div wrap>
+				<div indicator *foreach="videos as video, i" [attr.on]="i === index" (click|stop)="#SET_MAIN_VIDEO_INDEX(i)"></div>
+			</div>
+		</section>
+
+		<section class="track">
+			<div class="progress" [style.width.%]="currentVideo.percent"></div>
+		</section>
+	</section>
+</section>
+
+<!--<section class="logo" hidden [hidden]="is_started" animation="fade"></section>-->
+
+
+<script>
+$module.controller("viewController", function(store, actions, TextAnimation) {
+
+	return class {
+		init() {
+			this.index = store.main_videos_index;
+			this.videos = store.main_videos;
+			this.currentVideo = store.current_main_video;
+
+			this.t = new TextAnimation();
+
+			actions.FETCH_MAIN_VIDEOS();
+		}
+	}
+});
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,121 @@
+@import core
+@import colors
+
+ui-btn-group
+  display block
+  hbox()
+
+ui-btn
+  display block
+  cursor pointer
+  hbox()
+
+  &[type="icon"]
+    padding 15px
+
+  &[type="inline"]
+    height 26px
+    padding 0 12px
+    font-size 11px
+    color $btn-inline-color
+    border 1px solid $btn-inline-border
+    border-radius 13px
+
+    &:hover
+      background-color $btn-hover-bg
+
+    & + &
+      margin-left 6px
+
+
+  &[type="simple"]
+    padding 6px
+    font-size 18px
+    color $btn-simple-color
+    svg-icon svg #Icon
+    svg-icon svg #btn-order
+      fill @color
+
+    //> div
+    //  margin-top 3px
+
+    [icon]
+      margin-right 2px
+
+    //&:hover
+    //  color $btn-simple-hover-color
+
+    &[disabled]
+      cursor default
+      color $btn-simple-disabled-color
+      svg-icon svg #Icon
+      svg-icon svg #btn-order
+        fill @color
+
+  &[type="round"]
+    hbox()
+    height 48px
+    min-width 48px
+    max-width 359px
+    color $btn-round-color
+    border 1px solid $btn-round-border
+    border-radius 48px
+    text-align center
+
+    &[color="basic"]
+      color $basic
+      border-color $basic
+      svg-icon svg #Icon
+        fill @color
+
+    >*
+      flex()
+
+    >div
+      display none
+
+    & + &
+      margin-left 12px
+
+    &:hover
+      background-color $btn-hover-bg
+
+    &[disabled]
+      color $btn-round-disabled-color
+      border-color $btn-round-disabled-border
+      svg-icon svg #Icon
+        fill @color
+
+  &[type="round-block"]
+    hbox()
+    height 48px
+    min-width 48px
+    max-width 359px
+    color $btn-round-color
+    border 1px solid $btn-round-border
+    border-radius 48px
+    text-align center
+
+    >*
+      flex()
+
+    &:hover
+      background-color $btn-hover-bg
+
+
+  &[type="block"]
+    max-width 150px
+    height 48px
+    padding 6px
+    font-size 18px
+    color $btn-block-color
+    svg-icon svg #Icon
+    svg-icon svg #btn-order
+      fill @color
+
+    > div
+      flex()
+
+    [icon]
+      margin-right 2px
+

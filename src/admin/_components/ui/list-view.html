@@ -1,0 +1,225 @@
+<web-component name="ui-list-view">
+	<template [attr.edit-mode]="editMode">
+		<content></content>
+	</template>
+
+	<script>
+		app.component("ui-list-view", function(self) {
+			return {
+				init: function() {
+					self.selected = {};
+					self.selection = [];
+					self.editMode = "";
+
+					self.$watch("editMode", function() {
+						self.selected = {};
+					});
+				},
+
+				setEditMode: function(mode) {
+					if (mode !== self.editMode) {
+						self.selected = {};
+						self.selection = [];
+					}
+					self.editMode = mode;
+				},
+
+				select: function(id, data) {
+					data = data || id;
+					self.selected[id] = self.selected[id] == data ? undefined : data;
+					self.selection = self.getSelection();
+				},
+
+				flush: function() {
+					self.selected = {};
+				},
+
+				getSelection: function() {
+					var ids = [];
+					for (var id in self.selected) {
+						if (!self.selected.hasOwnProperty(id)) {
+							continue;
+						}
+
+						if (self.selected[id]) {
+							ids.push(self.selected[id]);
+						}
+					}
+
+					return ids;
+				}
+			}
+		});
+	</script>
+</web-component>
+
+
+<web-component name="ui-list-item">
+	<template>
+		<!--<div hbox style="width: 100%">-->
+		<ui-list-item-editing-control $editing-control>
+			<ui-checkbox></ui-checkbox>
+		</ui-list-item-editing-control>
+
+		<ui-list-item-content $content>
+			<ui-list-item-image>
+				<content select="img,ui-image"></content>
+			</ui-list-item-image>
+			<ui-list-item-text>
+				<content select="h1,h2,h3,h4,h5,h6,p"></content>
+			</ui-list-item-text>
+			<content></content>
+			<ui-list-item-accessory>
+				<content select="i,ui-form-button,ui-switch"></content>
+			</ui-list-item-accessory>
+		</ui-list-item-content>
+		<!--</div>-->
+		<!--<div $btn style="background: #ccc; width:0; position: absolute; top: 0; right:0; height: 100%; overflow: hidden">-->
+		<!--<ui-button>삭제</ui-button>-->
+		<!--</div>-->
+	</template>
+	<script>
+		app.component("ui-list-item", function(self, touch, transform, Animation) {
+
+			return;
+
+			var max_width = 44;
+			var x = 0;
+
+			function render(x) {
+				transform.translate(self.$content, x);
+
+				var width = Math.min(-x, max_width);
+				self.$btn.style.width = width + "px";
+			}
+
+			var cancel = document.createElement("ui-foreground");
+			touch.bind(cancel, {
+				tap: function() {
+//					alert("!");
+
+					var from = x;
+					var to = 0;
+
+					Animation.animate(380, from, to, function(value) {
+						x = value;
+						render(x);
+					}).then(function() {
+
+						cancel.parentNode.removeChild(cancel);
+					})
+				}
+			});
+
+			return {
+				init: function() {
+
+
+					touch.bind(self.$content, {
+						"panstart": function(e) {
+							self.classList.remove("active");
+						},
+
+						"pan-x": function(e) {
+
+							if (x < -max_width) {
+								x += e.deltaX / 2;
+							} else {
+								x += e.deltaX;
+							}
+
+							x = Math.min(0, x);
+							render(x);
+						},
+
+						"panend": function(e) {
+							var from = x;
+							var to = -max_width;
+
+							if (e.displacementX > 0) {
+								to = 0;
+							}
+
+							Animation.animate(380, from, to, function(value) {
+								x = value;
+								render(x);
+							})
+						}
+					})
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+<web-component name="ui-list-item-form">
+	<template>
+		<ui-list-item-content>
+			<ui-list-item-text>
+				<content select="h1,h2,h3,h4,h5,h6,p"></content>
+			</ui-list-item-text>
+			<content select="div,input,textarea,ui-badge,select"></content>
+			<ui-list-item-accessory>
+				<content select="i,ui-form-button,ui-switch,span"></content>
+			</ui-list-item-accessory>
+		</ui-list-item-content>
+	</template>
+</web-component>
+
+
+<web-component name="ui-list-item-form-image">
+	<template>
+		<ui-list-item-content>
+			<ui-list-item-text><content select="h1"></content></ui-list-item-text>
+			<div flex><content select="div,span,img,ui-image,input"></content></div>
+			<div><content select="em"></content></div>
+			<ui-list-item-accessory><content select="ui-form-button,ui-switch,ui-image-upload-button"></content>
+			</ui-list-item-accessory>
+		</ui-list-item-content>
+	</template>
+</web-component>
+
+
+<web-component name="ui-list-item-form-input">
+	<template>
+		<ui-list-item-content>
+			<ui-list-item-text>
+				<content select="h1"></content>
+			</ui-list-item-text>
+			<ui-list-item-input-bar>
+				<content select="input,div,span"></content>
+			</ui-list-item-input-bar>
+		</ui-list-item-content>
+	</template>
+</web-component>
+
+
+<web-component name="ui-list-item-form-multi-image-edit">
+	<template>
+		<div></div>
+		<ui-list-item-form-image *repeat="value as image, index">
+			<h1>IMG {{index + 1}}</h1>
+			<ui-image [src]="image.src" [width]="32" [height]="32"></ui-image>
+			<ui-form-button (click)="삭제하기(value, index)">삭제</ui-form-button>
+		</ui-list-item-form-image>
+
+		<ui-list-item-form-image>
+			<h1>IMG {{value.length + 1}}</h1>
+			<ui-image [src]="value[value.length].src" [width]="32" [height]="32"></ui-image>
+			<em>JPG, PNG</em>
+			<ui-image-upload-button [(value)]="value[value.length]">업로드</ui-image-upload-button>
+		</ui-list-item-form-image>
+	</template>
+	<script>
+		app.component("ui-list-item-form-multi-image-edit", function(self) {
+			return {
+				"삭제하기": function(arr, index) {
+					arr.splice(index, 1);
+					self.value = arr.slice();
+					self.value = self.value || [];
+				}
+			}
+		});
+	</script>
+</web-component>

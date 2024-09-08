@@ -1,0 +1,79 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+<template id="titlebar">
+	<h1>Tags</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">Tags</h2>
+	<ui-btn type="simple" icon="save" (click)="저장하기()">SAVE</ui-btn>
+</template>
+
+
+<template id="sidebar">
+	<ul>
+		<li *repeat="categories as category" [attr.selected]="categories.selected === category" (click)="선택하기(category)">{{ category }}</li>
+	</ul>
+</template>
+
+
+<template id="content">
+	<section class="content-wrap" style="width: 700px; height: 100%">
+		<ui-form style="height: 100%" vbox>
+			<ui-fields>
+				<h1>{{ categories.selected }}</h1>
+			</ui-fields>
+			<div flex>
+				<textarea style="height: 100%; width: 100%;" placeholder="여기를 클릭해서 입력하세요." [(value)]="tags[categories.selected]"></textarea>
+			</div>
+		</ui-form>
+	</section>
+</template>
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, $localStorageObject, http) {
+
+	return {
+		init: function() {
+			self.categories = ["works", "directors", "plan v"];
+			self.categories.selected = self.categories[0];
+			self.tags = {
+				"works": "",
+				"directors": "",
+				"plan v": ""
+			};
+
+			http.GET("/admin/api/configs/tags").then(function(res) {
+
+				console.log(res);
+
+
+				self.tags = res || {
+					"works": "",
+					"directors": "",
+					"plan v": ""
+				};
+			})
+		},
+
+		선택하기(category) {
+			self.categories.selected = category;
+		},
+
+		"저장하기": function() {
+
+			return http.PUT("/admin/api/configs/tags", {value: self.tags}).then(function(res) {
+				alert("저장되었습니다.");
+			});
+
+		}
+	}
+})
+</script>
+{% endblock %}

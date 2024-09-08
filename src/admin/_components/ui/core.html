@@ -1,0 +1,221 @@
+<script>
+	app.pipe("number", function() {
+		return function(value) {
+			return Number.format(value);
+		}
+	});
+
+	app.pipe("원", function() {
+		return function(value) {
+			return Number.format(value) + "원";
+		}
+	});
+</script>
+
+
+
+
+<web-component name="number-format" extends="input">
+	<template></template>
+	<script>
+		app.component("number-format", function(self) {
+
+			self.onkeypress = function(e) {
+				var char = String.fromCharCode(e.charCode);
+				if (!/[0-9]/.test(char)) {
+					e.preventDefault();
+				}
+			};
+
+			self.oninput = function(e) {
+				self.$setValue(self.value)
+			};
+
+			return {
+				$setValue: function(value) {
+					if (value === 0 && self.value === "") {
+						return;
+					}
+
+					if (/^0+$/.test(value) || value === 0) {
+						self.value = "0";
+						self.selectionStart = self.selectionEnd = 1;
+						return;
+					}
+
+					if (value === self.$getValue()) {
+						return;
+					}
+
+					value = "" + value;
+					value = value.slice(0, self.selectionEnd) + "^" + value.slice(self.selectionEnd);
+					value = value.replace(/[^0-9^]/g, "");
+					value = value.replace(/^0+/g, "");
+
+					var result = [];
+					var t = value;
+
+					while (t.length > 3) {
+						var sp = 4;
+						var s = t.slice(-4);
+						if (s.indexOf("^") === -1) {
+							s = t.slice(-3);
+							sp = 3;
+						}
+
+						result.unshift(s);
+						t = t.slice(0, -sp);
+					}
+					if (t.length > 0) {
+						result.unshift(t);
+					}
+
+					var number = result.join(",");
+					var index = number.indexOf("^");
+					number = number.replace("^", "");
+
+					self.value = number;
+
+					if (number.charAt(index - 1) === ",") {
+						index--;
+					}
+					self.selectionStart = self.selectionEnd = index;
+				},
+
+				$getValue: function() {
+					return +(self.value.replace(/^0+|\D+/g, ""));
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+<web-component name="file-upload" extends="input">
+	<template></template>
+	<script>
+		app.component("file-upload", function(self, http) {
+			return {
+				init: function() {
+					self.style.width = 0;
+					self.style.height = 0;
+
+					self.onchange = function() {
+
+						var promise = [];
+						var files = self.files;
+
+						var accept = self.getAttribute("accept") || "";
+						accept = accept.split(/\s?,\s?/);
+
+						promise = Array.map(files, function(file) {
+							return new Promise(function(resolve, reject) {
+								var reader = new FileReader();
+
+								var res = new http.Image;
+								res.name = file.name;
+								res.type = file.type;
+
+								if (accept.length) {
+									var ret = false;
+									foreach(accept, function(type) {
+
+										/// 확장자
+										if (type.charAt(0) === ".") {
+											var file_ext = file.name.slice(-type.length);
+											if (file_ext.toLowerCase() === type.toLowerCase()) {
+												ret = true;
+												return false;
+											}
+										}
+
+										// ex) image/*, audio/*, video/*
+										if (type.charAt(type.length - 1) === "*") {
+											var file_type = file.type.slice(0, type.length - 1) + "*";
+											if (type === file_type) {
+												ret = true;
+												return false;
+											}
+										}
+
+										// ex) image/jpeg, image/png, etc..
+										if (type === file.type) {
+											ret = true;
+										}
+									});
+
+									if (ret === false) {
+										reject(file);
+										return;
+									}
+								}
+
+								reader.onload = function(readerEvt) {
+									res.src = readerEvt.target.result;
+									resolve(res);
+								};
+
+								reader.readAsDataURL(file);
+							});
+						});
+
+						Promise.all(promise).then(function(res) {
+							res = self.multiple ? res : res[0];
+
+							self.data = res;
+							self.dispatchEvent(new CustomEvent("upload", {detail: {data: res}}));
+
+						}).catch(function(res) {
+							alert("업로드가 불가능한 파일 타입입니다. " + res.name);
+						})
+					}
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+
+
+<web-component name="image-upload">
+	<template>
+		<label>
+			<input type="file" is="file-upload" accept="image/*" (upload)="onUpload(event)" style="display: none"/>
+			<content></content>
+		</label>
+	</template>
+	
+	<script>app.component("image-upload", function(self) {
+		return {
+			onUpload: function(event) {
+				self.value = event.detail.data;
+				self.dispatchEvent(new CustomEvent("input"));
+			}
+		}
+	})</script>
+</web-component>
+
+
+
+
+<web-component name="image-multi-upload">
+	<template>
+		<label>
+			<input type="file" is="file-upload" accept="image/*" multiple (upload)="onUpload(event)" style="display: none"/>
+			<content></content>
+		</label>
+	</template>
+	
+	<script>app.component("image-multi-upload", function(self) {
+		return {
+			onUpload: function(event) {
+				self.value = event.detail.data;
+				self.dispatchEvent(new CustomEvent("input"));
+			}
+		}
+	})</script>
+</web-component>
+
+
+

@@ -1,0 +1,123 @@
+ui-btn-group {
+  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+ui-btn {
+  display: block;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+ui-btn[type="icon"] {
+  padding: 15px;
+}
+ui-btn[type="inline"] {
+  height: 26px;
+  padding: 0 12px;
+  font-size: 11px;
+  color: #3b769f;
+  border: 1px solid #3b769f;
+  border-radius: 13px;
+}
+ui-btn[type="inline"]:hover {
+  background-color: #f9f9f9;
+}
+ui-btn[type="inline"] + ui-btn[type="inline"] {
+  margin-left: 6px;
+}
+ui-btn[type="simple"] {
+  padding: 6px;
+  font-size: 18px;
+  color: #3b769f;
+}
+ui-btn[type="simple"] svg-icon svg #Icon,
+ui-btn[type="simple"] svg-icon svg #btn-order {
+  fill: #3b769f;
+}
+ui-btn[type="simple"] [icon] {
+  margin-right: 2px;
+}
+ui-btn[type="simple"][disabled] {
+  cursor: default;
+  color: #bbb;
+}
+ui-btn[type="simple"][disabled] svg-icon svg #Icon,
+ui-btn[type="simple"][disabled] svg-icon svg #btn-order {
+  fill: #bbb;
+}
+ui-btn[type="round"] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 48px;
+  min-width: 48px;
+  max-width: 359px;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 48px;
+  text-align: center;
+}
+ui-btn[type="round"][color="basic"] {
+  color: #3b769f;
+  border-color: #3b769f;
+}
+ui-btn[type="round"][color="basic"] svg-icon svg #Icon {
+  fill: #3b769f;
+}
+ui-btn[type="round"] >* {
+  flex: 1;
+}
+ui-btn[type="round"] >div {
+  display: none;
+}
+ui-btn[type="round"] + ui-btn[type="round"] {
+  margin-left: 12px;
+}
+ui-btn[type="round"]:hover {
+  background-color: #f9f9f9;
+}
+ui-btn[type="round"][disabled] {
+  color: #bbb;
+  border-color: #bbb;
+}
+ui-btn[type="round"][disabled] svg-icon svg #Icon {
+  fill: #bbb;
+}
+ui-btn[type="round-block"] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 48px;
+  min-width: 48px;
+  max-width: 359px;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 48px;
+  text-align: center;
+}
+ui-btn[type="round-block"] >* {
+  flex: 1;
+}
+ui-btn[type="round-block"]:hover {
+  background-color: #f9f9f9;
+}
+ui-btn[type="block"] {
+  max-width: 150px;
+  height: 48px;
+  padding: 6px;
+  font-size: 18px;
+  color: #3b769f;
+}
+ui-btn[type="block"] svg-icon svg #Icon,
+ui-btn[type="block"] svg-icon svg #btn-order {
+  fill: #3b769f;
+}
+ui-btn[type="block"] > div {
+  flex: 1;
+}
+ui-btn[type="block"] [icon] {
+  margin-right: 2px;
+}

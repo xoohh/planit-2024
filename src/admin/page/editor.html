@@ -1,0 +1,426 @@
+{% extends "layout/base" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/css/base.css"/>
+<link rel="stylesheet" type="text/css" href="/css/core.css"/>
+<link rel="stylesheet" type="text/css" href="/css/prototype.css"/>
+<link rel="stylesheet" type="text/css" href="/css/blog.css"/>
+<link rel="stylesheet" type="text/css" href="/admin/css/blog.css"/>
+{% endblock %}
+
+{% block body %}
+{% raw %}
+<script>app.factory("imageUpload", function() {
+
+	function openImage() {
+		var defer = Promise.defer();
+
+		var self = document.createElement("input");
+		self.type = "file";
+		self.multiple = true;
+		self.accpet = "image/*";
+
+		self.onchange = function(event) {
+			defer.resolve(event);
+		};
+
+		self.click();
+		return defer.promise;
+	}
+
+	function readFiles(file) {
+	
+		console.log(file);
+		
+		
+		var defer = Promise.defer();
+
+		var reader = new FileReader();
+		reader.onload = function(event) {
+			defer.resolve(event);
+		};
+
+		reader.readAsDataURL(file);
+		return defer.promise;
+	}
+
+	return function() {
+
+		return openImage()
+			.then(function(event) {
+				return Promise.all(Array.from(event.target.files).map(readFiles));
+			})
+
+			.then(function(arr) {
+				return arr.map(function(event) { return event.target.result; });
+			});
+	}
+})
+</script>
+
+
+<web-component name="gp-post-gallery">
+	<template>
+		<div hbox="wrap">
+			<div *repeat="data as img" [style.background-image.url]="img.src" contain style="width:25%" ratio="1:1"></div>
+		</div>
+	</template>
+	<script>module.component("gp-post-gallery", function(self) {
+		return {
+			init: function() {
+				console.log(self.data);
+			}
+		}
+	});
+	</script>
+</web-component>
+
+
+<web-component name="gp-post-iframe">
+	<template>
+		<iframe-wrap [inner-html]="html" [style.padding-top]="ptop"></iframe-wrap>
+		<div layer></div>
+	</template>
+	<script>module.component("gp-post-iframe", function(self) {
+		return {
+			init: function() {
+				var div = document.createElement("div");
+
+				self.$watch("data", function() {
+					if (!self.data) return;
+
+					div.innerHTML = self.data;
+					var iframe = div.querySelector("iframe");
+					if (!iframe) return;
+
+					if (iframe.hasAttributes("width") && iframe.getAttribute("height")) {
+						var width = iframe.getAttribute("width");
+						var height = iframe.getAttribute("height");
+						self.ptop = (height / width * 100) + "%";
+					}
+
+					self.html = iframe.outerHTML;
+				});
+			}
+		}
+	});
+	</script>
+</web-component>
+
+
+<web-component name="iframe-widget" extends="iframe">
+	<template></template>
+	<script>module.component("iframe-widget", function(self) {
+		return {
+			init: function() {
+				var $document = self.contentWindow.document;
+				var head = $document.getElementsByTagName("head")[0];
+
+				Array.from(document.styleSheets).forEach(function(sheet) {
+					var link = $document.createElement("link");
+					link.rel = "stylesheet";
+					link.type = "text/css";
+					link.href = sheet.href;
+					head.appendChild(link);
+				});
+
+				$document.addEventListener("click", function(e) {
+					self.dispatchEvent(new CustomEvent(e.type, e));
+				});
+
+				self.$document = $document = self.contentWindow.document;
+
+				var widget = document.createElement(self.getAttribute("name"));
+				self.data = JSON.parse(self.getAttribute("data"));
+				widget.data = self.data;
+				self.$document.body.innerHTML = "";
+				self.$document.body.appendChild(widget);
+
+				setTimeout(function() {
+					self.$document.body.appendChild(widget);
+				}, 250);
+
+				/// @FIXME!!!!!!!
+				setInterval(function() {
+					self.height = widget.offsetHeight + "px";
+				}, 250);
+			}
+		}
+	})</script>
+</web-component>
+
+
+<web-component name="ui-blog">
+	<template>
+		<label>
+			<div $editor blog contenteditable="true" style="outline: 0; padding: 16px 32px; display: block; white-space: pre-wrap;" spellcheck="false"></div>
+		</label>
+	</template>
+</web-component>
+<script>app.component("ui-blog", function(self, imageUpload) {
+
+	/// @TODO: 이미지 넣거나 복붙할때 자동으로 width, height를 붙여 주는 기능을 만들자.
+
+	var INLINE_LELVEL = "B,BIG,I,SMALL,TT,ABBR,ACRONYM,CITE,CODE,DFN,EM,KBD,STRONG,SAMP,VAR,A,BDO,BR,IMG,MAP,OBJECT,Q,SCRIPT,SPAN,SUB,SUP,BUTTON,INPUT,LABEL,SELECT,TEXTAREA".split(",");
+
+	return {
+		init: function() {
+			window.blog = self;
+
+			self.$watch("data", function() {
+				if (!self.data) return;
+				self.$editor.innerHTML = self.cleanHTML(self.data);
+			});
+
+			self.editor = self.$editor;
+
+			self.editor.addEventListener("keydown", function(e) {
+				switch (e.key) {
+					case "Enter":
+						var sel = document.getSelection();
+						if (self.editor.lastChild === sel.focusNode) {
+							if (sel.focusNode.nodeValue.length === sel.focusOffset) {
+								e.preventDefault();
+								self.insertHTML("\n\n");
+								break;
+							}
+						}
+
+						e.preventDefault();
+						self.insertHTML("\n");
+						break;
+				}
+			});
+
+			self.editor.addEventListener("paste", function(e) {
+				var item = e.clipboardData.items[1] || e.clipboardData.items[0];
+				if (!item) return;
+
+				e.preventDefault();
+
+				item.getAsString(function(text) {
+					if (text.slice(0, 7) === "<iframe" && text.slice(-9) === "</iframe>") {
+						self.insertWidget("gp-post-iframe", text);
+						return;
+					}
+
+					if (item.type !== "text/plain") {
+						text = self.cleanHTML(text);
+					}
+
+					self.insertHTML(text);
+				});
+			});
+
+			return self;
+		},
+
+		"cleanHTML": function(html) {
+			var div = document.createElement("div");
+			div.innerHTML = html;
+
+			var line = [];
+			var lines = [line];
+
+			$traversal(div, function(el) {
+				if (el.nodeType === 3) {
+					line.push(el.nodeValue);
+					return;
+				}
+
+				if (el.nodeType === 1) {
+					el.removeAttribute("style");
+				}
+
+				if (el.nodeName === "BR") {
+					line.push("\n");
+					return;
+				}
+
+				if (el.nodeName === "A") {
+					var innerHTML = self.cleanHTML(el.innerHTML);
+					el = el.cloneNode(false);
+					el.removeAttribute("style");
+					el.innerHTML = innerHTML;
+					line.push(el.outerHTML);
+					return false;
+				}
+
+				if (el.nodeName === "IMG") {
+					el.removeAttribute("style");
+					line.push(el.outerHTML);
+					return false;
+				}
+
+				if (el.nodeName === "IFRAME") {
+					line.push(el.outerHTML);
+					return false;
+				}
+
+				if (el.nodeType === 1) {
+
+					var display = window.getComputedStyle(el).display;
+					if (~display.indexOf("inline")) {
+//						console.log(el);
+						return;
+					}
+
+					if (~INLINE_LELVEL.indexOf(el.tagName)) {
+//						console.log(el);
+						return;
+					}
+
+					if (line.length) {
+						line = [];
+						lines.push(line);
+					}
+					return;
+				}
+			});
+
+			return lines.filter(function(line) {
+				return line.length;
+			}).map(function(line) {
+				return line.join("");
+			}).join("\n");
+		},
+
+
+		"applyStyle": function(style) {
+			var sel = document.getSelection();
+			if (sel.type !== "Range") {
+				return;
+			}
+
+			document.execCommand("createLink", false, style);
+			Array.from(document.querySelectorAll("a")).forEach(function(a) {
+				if (a.getAttribute("href") === style) {
+					a.removeAttribute("href");
+					a.setAttribute("type", style);
+				}
+			});
+		},
+
+		"removeStyle": function() {
+			var sel = document.getSelection();
+			if (sel.type !== "Range") {
+				return;
+			}
+
+			document.execCommand("unLink", false);
+		},
+
+
+		"uploadImage": function() {
+			imageUpload().then(function(imgs) {
+
+				return Promise.all(imgs.map(function(src) {
+					var defer = Promise.defer();
+
+					var img = new Image();
+					img.onload = function() {
+						img.width = img.naturalWidth;
+						img.height = img.naturalHeight;
+						defer.resolve(img);
+					};
+					img.src = src;
+
+					return defer.promise;
+				})).then(function(imgs) {
+					var html = imgs.map(function(i) { return i.outerHTML}).join("\n");
+					self.insertHTML(html);
+				})
+
+
+			});
+			self.editor.focus();
+		},
+
+		"createLink": function(link) {
+			self.editor.focus();
+			document.execCommand("createLink", false, link);
+		},
+
+		"insertHTML": function(html) {
+			self.editor.focus();
+			document.execCommand("insertHTML", false, html);
+		},
+
+		"insertWidget": function(name, data) {
+			var span = document.createElement("span");
+			span.setAttribute("data", JSON.stringify(data || null));
+			data = span.getAttribute("data");
+
+			self.editor.focus();
+			self.insertHTML("<iframe is='iframe-widget' scrolling='no' height='0' name='" + name + "' data='" + data + "'></iframe>");
+		},
+
+		"getHTML": function() {
+			return self.editor.innerHTML;
+		},
+
+		"getSelection": function() {
+			self.editor.focus();
+			return document.getSelection();
+		},
+
+		"selectNode": function(el) {
+			self.editor.focus();
+			var range = document.getSelection().getRangeAt(0);
+			range.selectNode(el);
+		}
+	};
+});
+</script>
+
+
+<web-component name="gp-blog-editor">
+	<template [attr.mode]="mode">
+		<div style="padding: 22px 10px;">
+			<section style="background: #fff;  box-shadow: 0 0 10px rgba(0,0,0,0.2);">
+				<label [visible]="blog.hasCover">
+					<image-upload [(value)]="blog.cover"></image-upload>
+					<img style="display: block; width: 100%;" [src]="blog.cover.src" [visible]="blog.cover.src">
+					<div ratio="2:1" [visible]="!blog.cover.src" style="background: url(/admin/img/btn-img.svg) no-repeat center center; background-size: 48px auto" hbox>
+						<div style="margin: auto"><br><br><br><br><br>IMG UPLOAD</div>
+					</div>
+				</label>
+				
+				<section style="font-size: 17px; font-weight: bold; border: 1px dashed #ccc">
+					<label>
+						<div style="min-height: 1em; padding: 12px 32px;" [style.color]="blog.title_color" contenteditable="plaintext-only" spellcheck="false" [(inner-text)]="blog.name"></div>
+					</label>
+				</section>
+				
+				<ui-blog [data]="blog.body"></ui-blog>
+			</section>
+		</div>
+		
+		<section>
+			<h1>Tags</h1>
+			<space size="6"></space>
+			<p>
+				<highlight style="color:#3b769f">#{{ blog.tags | join:' #'}}</highlight>
+			</p>
+			<space size="32"></space>
+		</section>
+	</template>
+	
+	<script>app.component("gp-blog-editor", function(self) {
+		return {
+			init: function() {
+				window.$gp = self;
+			}
+		}
+	});
+	</script>
+</web-component>
+
+
+<main>
+	<gp-blog-editor style="display:block; margin: auto"></gp-blog-editor>
+</main>
+
+{% endraw %}
+{% endblock %}
+

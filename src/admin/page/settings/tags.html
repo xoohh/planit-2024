@@ -1,0 +1,92 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+<template id="titlebar">
+	<h1>Settings</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">Tags</h2>
+	<ui-btn type="simple" icon="save" (click)="저장하기()">SAVE</ui-btn>
+</template>
+
+
+<template id="sidebar">
+	<ul>
+		<li><a href="/admin/settings/configs">메뉴</a></li>
+		<li selected="true"><a href="/admin/settings/tags">태그</a></li>
+		<li><a href="/admin/settings/paypal">페이팔</a></li>
+	</ul>
+</template>
+
+
+<template id="content">
+	<section class="content-wrap" style="width: 700px">
+		<ui-form>
+			<ui-fields>
+				<h1>태그색상</h1>
+				<p [visible]="!tag_color_table">태그를 불러오는 중...</p>
+
+				<ui-field *repeat="tag_color_table as tag">
+					<h1>{{ tag.name }}</h1>
+					<div flex><label><input type="text" [(value)]="tag.color" placeholder="색상직업입력 or 우측 버튼을 눌러 선택"></label></div>
+					<div><label><input type="color" [(value)]="tag.color"></label></div>
+				</ui-field>
+			</ui-fields>
+		</ui-form>
+	</section>
+</template>
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, $localStorageObject, http) {
+
+	return {
+		init: function() {
+			self.blog_config = $localStorageObject("blog-config");
+			self.tags = self.blog_config.tags;
+
+			http.GET("/admin/api/configs/tag-colors").then(function(res) {
+				self.tag_colors = res || {};
+			}).catch(function() {
+				self.tag_colors = {};
+			})
+
+			http.GET("/admin/api/tags").then(function(res) {
+				self.blog_config = $localStorageObject("blog-config");
+				self.blog_config.tags = self.tags = res;
+				self.blog_config.save();
+			});
+
+			self.$watch(["tag_colors", "tags"], function() {
+				if (!self.tags) return;
+				if (!self.tag_colors) return;
+				
+				self.tag_color_table = self.tags.map(function(tag) {
+					return {name: tag, color: self.tag_colors[tag] || ""};
+				});
+			});
+		},
+
+		"저장하기": function() {
+			var tag_colors = {};
+			
+			self.tag_color_table.forEach(function(t) {
+				if (t.color) {
+					tag_colors[t.name] = t.color;
+				}
+			});
+
+			self.tag_colors = tag_colors;
+			return http.PUT("/admin/api/configs/tag-colors", {value: self.tag_colors}).then(function(res) {
+				alert("저장되었습니다.");
+			});
+		}
+	}
+})
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+<web-component name="ui-pagination">
+	<template>
+		<section id="table-action-bar">
+			<div flex></div>
+			<div>Rows per page</div>
+			
+			<space size="12"></space>
+			
+			<select number [(value)]="params.limit" (change)="새로고침()">
+				<option>10</option>
+				<option>25</option>
+				<option>50</option>
+				<option>100</option>
+			</select>
+			
+			<space size="22"></space>
+			
+			<div>{{ params.page * params.limit + 1}} - {{ Math.min(items$.rows.total, params.page * params.limit + params.limit) }} of {{ items$.rows.total }}</div>
+			
+			<space size="16"></space>
+			
+			<ui-btn type="round" (click)="페이징이동(-1)" [disabled]="params.page <= 0" icon="back"></ui-btn>
+			<ui-btn type="round" (click)="페이징이동(1)" [disabled]="params.page * params.limit + params.limit > items$.rows.total" icon="next"></ui-btn>
+		</section>
+	</template>
+	<script>module.component("ui-pagination", function(self) {
+		return {
+			init: function() {
+
+			},
+
+			"새로고침": function() {
+				return self.items$.fetch();
+			},
+
+			"페이징이동": function(offset) {
+				self.params.page = Math.max(0, self.params.page + offset);
+				return self.새로고침();
+			}
+		}
+	})</script>
+</web-component>
+

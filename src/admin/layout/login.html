@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>{{ config.title }}</title>
+	
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="initial-scale=1, width=device-width, minimum-scale=0.1, user-scalable=no"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	{#
+	<meta property="og:image" content="{{fb_image}}"/>
+	#}
+	{#
+	<meta property="og:title" content="{{title and title + " -
+	"}}config.name" />#}
+	{#
+	<meta property="og:description" content='{{fb_desc}}'/>
+	#}
+	<link rel="shortcut icon" href="/favicon.ico">
+	
+	{% block css %}
+	<link rel="stylesheet" type="text/css" href="/css/base.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/core.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/prototype.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/blog.css"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/admin.css?v=2"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/icons.css?v=1"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/btns.css"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/blog.css"/>
+	{% endblock %}
+
+	<script src="/admin/js/polyfill.min.js"></script>
+	<script src="/admin/js/ie_polyfill.js"></script>
+
+	<script src="/admin/js/fetch.js"></script>
+	<script src="/admin/js/1px.util.js"></script>
+	<script src="/admin/js/1px.custom-element.js"></script>
+	<script src="/admin/js/1px.module.js"></script>
+	<script src="/admin/js/1px.watch.js"></script>
+	<script src="/admin/js/1px.expression.js"></script>
+	<script src="/admin/js/1px.compile.js"></script>
+	<script src="/admin/js/1px.component.js"></script>
+	<script src="/admin/js/1px.core.js"></script>
+	<script src="/admin/js/1px.touch.js"></script>
+	<script src="/admin/js/1px.animation.js"></script>
+	<script src="/admin/js/1px.http.js"></script>
+	<script src="/admin/js/1px.upload.js"></script>
+	<script src="/admin/js/1px.jquery.js"></script>
+	<script src="/admin/js/1px.sticky-position.js"></script>
+
+	<script src="/admin/js/config.js"></script>
+
+	
+	{% set components = scandir("components") %}
+	{% for path in components -%}
+	<link rel="import" href="/admin/components{{path}}"/>
+	{% endfor %}
+	
+	<script src="/admin/js/1px.html-import.js"></script>
+	<!--<script src="/js/script.js"></script>-->
+</head>
+<body vbox>
+
+<script>module.component("viewController", function(self, http) {
+	return {
+		init: function() {
+			self.params = {};
+		},
+
+		"로그인하기": function() {
+			return http.POST("/admin/api/account", self.params).then(function() {
+				return location.reload();
+			});
+		}
+	}
+})
+</script>
+
+
+<section id="title">
+	<ui-btn type="icon" disabled><i icon="menu"></i></ui-btn>
+	<h1><a href="/" target="_blank">{{ config.title }}</a></h1>
+	<h2>1px administration system</h2>
+</section>
+
+
+<template is="dom-bind" link="viewController">
+	<section id="toolbar" hbox>
+		<div class="menu-actions" *template="'toolbar'"></div>
+	</section>
+	
+	<section flex hbox="start">
+		<div flex *template="'content'"></div>
+		<div class="copyright" style="left: 22px">
+			<img src="/admin/img/copyright-1px.svg" width="70" height="10"/>
+		</div>
+	</section>
+	
+	<ui-popup *if="popup" [delegate]="this">
+		<div *template="popup"></div>
+	</ui-popup>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">Login</h2>
+</template>
+
+<template id="content">
+	<section class="content-wrap">
+		<form (submit)="로그인하기()">
+			<ui-form type="narrow">
+				<ui-fields>
+					<ui-field>
+						<h1>Email</h1>
+						<input type="text" [(value)]="params.email" placeholder="Type your email" autofocus/>
+					</ui-field>
+					
+					<ui-field>
+						<h1>Password</h1>
+						<input type="password" [(value)]="params.password" placeholder="Type your password"/>
+					</ui-field>
+				</ui-fields>
+			</ui-form>
+			
+			<section>
+				<ui-btn type="round-block" color="basic" (click)="로그인하기()">
+					<div>Login</div>
+				</ui-btn>
+				<!--<space size="12"></space>-->
+				<!--<a href="" note>Forgotten yout password?</a>-->
+			</section>
+		</form>
+	</section>
+</template>
+
+
+</body>
+</html>
+

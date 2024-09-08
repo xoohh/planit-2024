@@ -1,0 +1,48 @@
+<web-component name="ui-action-sheet">
+	<template>
+		<div class="actions-modal" $modal>
+			<content></content>
+
+			<div class="actions-modal-group">
+				<div class="actions-modal-button color-red" (click)="hide()">취소</div>
+			</div>
+		</div>
+
+		<div class="modal-overlay" $overlay (click)="hide()"></div>
+	</template>
+	<script>
+		app.component("ui-action-sheet", function(self, transform) {
+			return {
+				init: function() {
+				},
+
+				show: function() {
+					document.body.appendChild(self);
+
+					$nextFrame(function() {
+						self.$modal.classList.add("modal-in");
+						self.$overlay.classList.add("modal-overlay-visible");
+					});
+				},
+
+				hide: function() {
+
+					$nextFrame(function() {
+						self.$modal.classList.add("modal-out");
+						self.$overlay.classList.remove("modal-overlay-visible");
+					});
+
+					setTimeout(function() {
+
+						self.$modal.classList.remove("modal-out");
+						self.$modal.classList.remove("modal-in");
+						self.$overlay.classList.remove("modal-overlay-visible");
+
+					}, 500);
+
+				}
+			}
+		});
+	</script>
+</web-component>
+

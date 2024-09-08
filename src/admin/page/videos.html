@@ -1,0 +1,381 @@
+{% extends "layout/default" %}
+
+{% block content %}
+{% raw %}
+<style>
+	.video ui-image-upload-preview {
+		width: 100%;
+		height: 200px;
+	}
+
+</style>
+<template id="titlebar">
+	<h1>Videos</h1>
+</template>
+
+
+<template id="toolbar">
+	<h2 class="menu-title-sub">정보</h2>
+
+	<ui-btn type="simple" icon="add" (click)="편집하기({})">ADD</ui-btn>
+	<ui-btn type="simple" icon="remove" [attr.disabled]="selected == null" (click)="제품삭제하기(selected)">DELETE</ui-btn>
+
+	<space size="32"></space>
+
+	<ui-btn-group>
+		<ui-btn type="simple" (click)="상태변경하기(selected, '공개')" [attr.disabled]="selected == null">공개</ui-btn>
+		<ui-btn type="simple" (click)="상태변경하기(selected, '비공개')" [attr.disabled]="selected == null">비공개</ui-btn>
+	</ui-btn-group>
+
+	<div flex></div>
+
+	<ui-search (submit)="새로고침()" [(value)]="params.search"></ui-search>
+</template>
+
+
+<template id="sidebar">
+	<h1>상태</h1>
+	<ul *repeat="['공개', '비공개'] as row">
+		<li menu-1 [attr.selected]="params.status === row" (click)="상태선택하기(row)">{{ row }}
+			<span>({{ count[row] || '0'}})</span>
+		</li>
+	</ul>
+
+	<space size="32"></space>
+
+	<h1>카테고리</h1>
+	<ul *repeat="categories as row">
+		<li menu-1 [attr.selected]="params.category === row" (click)="카테고리선택하기(row)">{{ row }}
+			<!--<span>({{ count[row] || '0'}})</span>-->
+		</li>
+	</ul>
+
+</template>
+
+
+<template id="content">
+	<section class="content-wrap">
+		<table>
+			<thead>
+			<tr>
+				<th style="width: 36px"></th>
+				<th style="width: 140px"></th>
+				<th left>Video</th>
+				<th style="width: 100px">상태</th>
+				<th style="width: 120px">작성일</th>
+			</tr>
+			</thead>
+
+			<tbody>
+			<tr *repeat="items$.rows as item, index" (click)="선택하기(item)" [attr.selected]="selected === item">
+				<td><i icon="checkbox"></i></td>
+				<td>
+					<div ratio="2:1" cover [style.background-image.url]="item.thumbnail.src || item.video_thumbnail"></div>
+				</td>
+				<td left>
+					<h1><span clickable (click)="편집하기(item)">{{ item.name || '-' }}</span></h1>
+					<h2>{{ item.desc || '-' }}</h2>
+					<div hbox>
+						<p [inner-html]="item.tag_categories.join(', ') | highlight: params.tag_categories.slice() "></p>
+						<span style="margin: 0 0.5em">/</span>
+						<p [inner-html]="item.tags.join(', ') | highlight: params.tags.slice() "></p>
+					</div>
+				</td>
+				<td><span [attr.class]="'status '+item.status">{{ item.status }}</span></td>
+				<td>
+					<div>{{ item.created_at | date:'yyyy-mm-dd' }}</div>
+					<div>{{ item.created_at | date:'hh:ii:ss' }}</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<space size="12"></space>
+
+		<ui-pagination [items$]="items$" [params]="params"></ui-pagination>
+	</section>
+</template>
+
+
+<template id="제품편집">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>EDIT MODE</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+
+
+	<section popup-content-wrap>
+		<ui-form>
+			<ui-fields>
+				<h1>비디오 {{ item.video_id }}</h1>
+
+				<ui-field>
+					<h1>URL</h1>
+					<input type="text" [(value)]="item.video_url"/>
+					<ui-btn type="inline" (click)="Vimeo업로드(item.video_url)">LOAD</ui-btn>
+				</ui-field>
+
+				<ui-field [visible]="item.video_id">
+					<h1>반복구간설정</h1>
+					<input type="text" [(value)]="item.video_start_at" placeholder="시작시간(초)"/>
+					<input type="text" [(value)]="item.video_end_at" placeholder="종료시간(초)"/>
+				</ui-field>
+			</ui-fields>
+
+
+			<section [visible]="item.video_id">
+				<ui-fields>
+					<h1>기본정보</h1>
+					<ui-field>
+						<h1>이미지</h1>
+						<div flex>
+							<img [src]="item.thumbnail.src || item.video_thumbnail" width="360"/>
+						</div>
+					</ui-field>
+
+					<ui-field>
+						<h1>업로드</h1>
+						<ui-btn type="inline">
+							<image-upload [(value)]="item.thumbnail">
+								<ui-btn>UPLOAD</ui-btn>
+							</image-upload>
+						</ui-btn>
+					</ui-field>
+
+					<ui-field>
+						<h1>제목</h1>
+						<input type="text" [(value)]="item.name"/>
+					</ui-field>
+
+					<ui-field>
+						<h1>설명</h1>
+						<input type="text" [(value)]="item.desc"/>
+					</ui-field>
+				</ui-fields>
+
+
+				<ui-fields>
+					<h1>태그</h1>
+					<ui-field>
+						<h1>카테고리</h1>
+						<div hbox="wrap">
+							<label *repeat="categories as tag" style="display: block; margin: 5px">
+								<input type="checkbox" [value]="tag" [(checked)]="item.tag_categories"/> {{ tag }}
+							</label>
+						</div>
+					</ui-field>
+
+
+					<ui-field *repeat="categories.slice(1) as category">
+						<h1>{{ category }}</h1>
+						<div hbox="wrap">
+							<label *repeat="tags[category] as tag" style="display: block; margin: 5px">
+								<input type="checkbox" [value]="tag" [(checked)]="item.tags"/> {{ tag }}
+							</label>
+						</div>
+					</ui-field>
+				</ui-fields>
+
+
+				<ui-fields [visible]="item.created_at2">
+					<h1>작성일(순서변경)</h1>
+
+					<ui-field>
+						<input flex type="datetime" [(value)]="item.created_at2"></input>
+					</ui-field>
+				</ui-fields>
+			</section>
+
+		</ui-form>
+	</section>
+
+	<footer>
+		<ui-btn type="simple" (click)="저장하기(item)" icon="save">SAVE</ui-btn>
+	</footer>
+</template>
+
+
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.factory("jsonp", function() {
+
+	let uuid = 0;
+
+	return function(url) {
+
+		return new Promise((resolve, reject) => {
+			uuid++;
+			let script = document.createElement("script");
+			let callbackName = "_callback" + uuid;
+			window[callbackName] = function(value) {
+				resolve(value);
+				delete window[callbackName];
+			};
+
+			script.src = url + "?callback=" + callbackName;
+			script.onerror = (error) => {
+				reject(error);
+			};
+
+			document.body.appendChild(script);
+		});
+	}
+})
+</script>
+
+<script>module.component("viewController", function(self, collection, http, jsonp) {
+
+	const tag$ = http.GET("/admin/api/configs/tags");
+
+	return {
+		init() {
+			self.store = window.CONFIG;
+
+			self.categories = ["main", "works", "directors", "plan v"];
+
+			self.item = null;
+			self.selected = null;
+			self.popup = null;
+
+			self.params = {
+				category: [],
+				tags: [],
+				search: "",
+				page: 0,
+				limit: 25
+			};
+
+			tag$.then(tags => {
+				self.tags = Object.entries(tags).reduce((o, [key, value]) => {
+					o[key] = value.trim().split(/\n+/);
+					return o;
+				}, {})
+			});
+
+			self.items$ = collection("/admin/api/items", self.params);
+			return self.새로고침();
+		},
+
+		"새로고침"() {
+			self.selected = null;
+			self.item = null;
+
+			http.GET("/admin/api/items/count").then((function(res) {
+				self.count = res;
+			}));
+
+			return self.items$.fetch();
+		},
+
+		"페이징이동"(offset) {
+			self.params.page = Math.max(0, self.params.page + offset);
+			return self.새로고침();
+		},
+
+		"상태선택하기"(status) {
+			self.params.status = self.params.status === status ? null : status;
+			return self.새로고침();
+		},
+
+		"카테고리선택하기"(category) {
+			self.params.category = self.params.category === category ? null : category;
+			return self.새로고침();
+		},
+
+		"태그선택하기"(tag) {
+			self.params.tags.toggle(tag);
+			self.params.tags = self.params.tags.slice();
+			return self.새로고침();
+		},
+
+		"선택하기"(item) {
+			self.selected = self.selected === item ? null : item;
+		},
+
+		"편집하기"(item) {
+			self.item = Object.clone(item);
+			self.item.tags = self.item.tags || [];
+			self.item.tag_categories = self.item.tag_categories || [];
+			self.item.created_at2 = Date.format('yyyy-mm-dd hh:ii:ss', self.item.created_at);
+			self.popup = "제품편집";
+		},
+
+		"상태변경하기"(item, status) {
+			item.status = status;
+			return self.저장하기(item);
+		},
+
+		"제품삭제하기"(item) {
+			if (confirm("정말 삭제하시겠습니까?")) {
+				return self.items$.remove(item).then(function() {
+					self.selected = null;
+					return self.새로고침();
+				});
+			}
+		},
+
+		"Vimeo업로드"(id) {
+
+
+			/// https://vimeo.com/355462415
+
+			id = id.split("/").pop();
+
+			jsonp(`//vimeo.com/api/v2/video/${id}.json`).then(res => {
+
+					res = res[0];
+
+					console.log(res);
+					console.log(res.id);
+
+
+					self.item.video_id = "" + res.id;
+					self.item.video_thumbnail = res.thumbnail_large;
+					self.item.name = res.title;
+					self.item.desc = res.description;
+				})
+
+				.catch(error => {
+					alert("유효하지 않은 URL이거나, 사용 할 수 없는 영상입니다.");
+				})
+		},
+
+
+		"저장하기"(item) {
+
+			console.log("@@@", item);
+
+
+			var config = self.store;
+
+			item.status = item.status || "비공개";
+
+			try {
+				item.created_at = new Date(item.created_at2).toISOString();
+
+			} catch (e) {
+
+				console.log(e);
+			}
+
+			return self.items$.save(item).then(function() {
+				self.팝업닫기();
+				return self.새로고침();
+			})
+		},
+
+		"팝업닫기"() {
+			self.popup = null;
+			self.selected = null;
+			self.item = null;
+		}
+	}
+})
+</script>
+{% endblock %}

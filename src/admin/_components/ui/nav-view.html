@@ -1,0 +1,317 @@
+<web-component name="ui-nav-view-controller">
+	<template>
+		<ui-nav-bar-controller $nav-bar></ui-nav-bar-controller>
+		<ui-backdrop $backdrop></ui-backdrop>
+		<ui-view $view></ui-view>
+	</template>
+	<script>
+		app.component("ui-nav-view-controller", function(self, transform) {
+
+			var ANIMATE_DURATION = 500;
+
+			function callReady(view, args) {
+				if (!view) {
+					return;
+				}
+
+				if (typeof view.ready === "function") {
+					view.ready.apply(view, args);
+				}
+			}
+
+			return {
+				init: function() {
+					self.$navBar.delegate = self;
+//					window.onfocus = function() {
+//						callReady(self.$view, self.$view.args);
+//					}
+				},
+
+				back: function() {
+					return back();
+				},
+
+				refresh: function() {
+					foreach(self.childNodes, function(view) {
+						callReady(view, view.args);
+					});
+				},
+
+				push: function(name, args, animate) {
+
+					var v = document.createElement(name);
+					v.classList.add("ui-view");
+					v.viewController = self;
+
+					var v0 = self.$view;
+					if (animate) {
+						transform.translate(v, "100%", 0);
+					}
+					self.appendChild(v);
+
+					var navbarItem = v.querySelector("ui-nav-bar");
+					self.$navBar.push(navbarItem, animate);
+
+					self.$view = v;
+					self.$view.args = args;
+
+					callReady(v, args);
+
+					if (animate) {
+						return Animation.animate(ANIMATE_DURATION, 1, 0, function(value) {
+							transform.translate(self.$backdrop, (value * 100 - 100) + "%", 0);
+							transform.opacity(self.$backdrop, (1 - value), 0);
+							transform.translate(v, (value * 100) + "%", 0);
+							transform.translate(v0, ((1 - value) / -4 * 100) + "%", 0);
+						})
+					}
+				},
+
+				modal: function(name, args, animate) {
+
+					var v = document.createElement(name);
+					v.classList.add("ui-view");
+					v.classList.add("ui-view-modal");
+					v.$transitionType = "modal";
+					v.viewController = self;
+					self.appendChild(v);
+
+					var navbarItem = v.querySelector("ui-nav-bar");
+					self.$view = v;
+					self.$view.args = args;
+					callReady(v, args);
+
+					if (animate) {
+
+//						transform.translate(self.$backdrop, 0, 0);
+						return Animation.animate(ANIMATE_DURATION, 1, 0, function(value) {
+//							transform.translate(self.$backdrop, (value * 100 - 100) + "%", 0);
+//							transform.opacity(self.$backdrop, (1 - value), 0);
+							transform.translate(v, 0, (value * 100) + "%");
+//							transform.translate(v0, ((1 - value) / -4 * 100) + "%", 0);
+						})
+					}
+				},
+
+				pop: function(args, animate) {
+					var v0 = self.$view.previousElementSibling;
+					var v = self.$view;
+
+					self.$view = v0;
+					self.$view.args = args;
+
+					if (v.$transitionType === "modal") {
+
+						if (animate) {
+							return Animation.animate(ANIMATE_DURATION, 0, 1, function(value) {
+//							transform.translate(self.$backdrop, (value * 100 - 100) + "%", 0);
+//							transform.opacity(self.$backdrop, (1 - value), 0);
+								transform.translate(v, 0, (value * 100) + "%");
+//							transform.translate(v0, ((1 - value) / -4 * 100) + "%", 0);
+							}).then(function() {
+								moveTo(self.$backdrop, -100 + "%");
+
+								v.parentNode.removeChild(v);
+								callReady(v0, args);
+							})
+						}
+
+						return;
+					}
+
+					self.$navBar.pop(animate);
+
+					return Animation.animate(ANIMATE_DURATION, 0, 1, function(value) {
+						transform.translate(self.$backdrop, (value * 100 - 100) + "%", 0);
+						transform.opacity(self.$backdrop, (1 - value), 0);
+						transform.translate(v, (value * 100) + "%", 0);
+						transform.translate(v0, ((1 - value) / -4 * 100) + "%", 0);
+					}).then(function() {
+						moveTo(self.$backdrop, -100 + "%");
+
+						v.parentNode.removeChild(v);
+						callReady(v0, args);
+					})
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+<web-component name="ui-nav-bar-controller">
+	<template><content></content></template>
+	<script>
+		app.component("ui-nav-bar-controller", function(self, transform) {
+			return {
+				init: function() {
+
+				},
+
+				push: function(navItem, animate) {
+					self.appendChild(navItem);
+					navItem.bar = self;
+					navItem.animatePush(animate);
+
+					if (self.topItem) {
+						self.topItem.animatePushBack(animate);
+						navItem.backTitle = self.topItem.title;
+						navItem.hasBackButton = true;
+					}
+
+					self.prevItem = self.topItem;
+					self.topItem = navItem;
+				},
+
+				pop: function(animate) {
+
+					var top = self.topItem;
+					var prev = self.prevItem;
+
+					self.topItem = self.prevItem;
+					self.prevItem = self.topItem.previousElementSibling;
+
+					top.animatePopBack();
+
+					if (!prev) {
+						return;
+					}
+
+					prev.animatePop().then(function() {
+						self.removeChild(top);
+					})
+				}
+			}
+		});
+	</script>
+</web-component>
+
+
+<web-component name="ui-nav-bar">
+	<template>
+		<ui-nav-bar-inner>
+			<ui-nav-bar-left>
+				<ui-bar-button *if="hasBackButton" (click)="_back()"><i icon="back" $back></i>
+					<span $left>{{backTitle}}</span>
+				</ui-bar-button>
+				<content select="ui-bar-button[left]"></content>
+			</ui-nav-bar-left>
+			<ui-nav-bar-center $center>
+				<content select="h1,h2"></content>
+			</ui-nav-bar-center>
+			<ui-nav-bar-right $right>
+				<content select="ui-bar-button[right]"></content>
+			</ui-nav-bar-right>
+		</ui-nav-bar-inner>
+	</template>
+	<script>
+		app.component("ui-nav-bar", function(self, transform) {
+			var NAV_ANIMATION_DURATION = 500;
+			var NAV_ANIMATION_DURATION2 = 250;
+
+			return {
+				init: function() {
+					self.hasBackButton = false;
+					self.backTitle = "";
+					self.title = self.querySelector("h1").innerText;
+				},
+
+				_back: function() {
+					if (self.bar && self.bar.delegate) {
+						return self.bar.delegate.back();
+					}
+				},
+
+				animatePushBack: function(animate) {
+					self.title = self.querySelector("h1").innerText;
+
+					var duration = animate ? NAV_ANIMATION_DURATION : 0;
+					var duration2 = animate ? NAV_ANIMATION_DURATION2 : 0;
+
+					var rect = self.$left.getBoundingClientRect();
+					var rect2 = self.$center.getBoundingClientRect();
+					var w = (rect2.left + rect2.width / 2) - (rect.left + rect.width / 2);
+
+					Animation.animate(duration2, 0, 1, function(value) {
+						transform.opacity(self.$back, (1 - value));
+						transform.opacity(self.$left, (1 - value));
+						transform.opacity(self.$right, (1 - value));
+						transform.opacity(self.$center, (1 - value));
+					});
+
+					return Animation.animate(duration, 0, 1, function(value) {
+						var x = (value) * -100;
+						var x2 = (value) * -w;
+						transform.translate(self.$left, x + "%");
+						transform.translate(self.$center, x2 + "px");
+					});
+				},
+
+				animatePush: function(animate) {
+					self.title = self.querySelector("h1").innerText;
+
+					var duration = animate ? NAV_ANIMATION_DURATION : 0;
+					var duration2 = animate ? NAV_ANIMATION_DURATION2 : 0;
+
+					var rect = self.$left.getBoundingClientRect();
+					var rect2 = self.$center.getBoundingClientRect();
+					var w = (rect2.left + rect2.width / 2) - (rect.left + rect.width / 2);
+
+					Animation.animate(duration2, 0, 1, function(value) {
+						transform.opacity(self.$left, value);
+						transform.opacity(self.$center, value);
+						transform.opacity(self.$right, value);
+					});
+
+					return Animation.animate(duration, 0, 1, function(value) {
+						var x = (1 - value) * w;
+						transform.translate(self.$left, x + "px");
+						transform.translate(self.$center, x + "px");
+					});
+				},
+
+				animatePopBack: function() {
+					self.title = self.querySelector("h1").innerText;
+
+					var rect = self.$left.getBoundingClientRect();
+					var rect2 = self.$center.getBoundingClientRect();
+					var w = (rect2.left + rect2.width / 2) - (rect.left + rect.width / 2);
+
+					Animation.animate(NAV_ANIMATION_DURATION2, 1, 0, function(value) {
+						transform.opacity(self.$back, value);
+						transform.opacity(self.$left, value);
+						transform.opacity(self.$center, value);
+						transform.opacity(self.$right, value);
+					});
+
+					return Animation.animate(NAV_ANIMATION_DURATION, 1, 0, function(value) {
+						var x = (1 - value) * w;
+						transform.translate(self.$left, x + "px");
+						transform.translate(self.$center, x + "px");
+					});
+				},
+
+				animatePop: function() {
+					self.title = self.querySelector("h1").innerText;
+
+					var w = self.offsetWidth / 2;
+
+					Animation.animate(NAV_ANIMATION_DURATION2, 1, 0, function(value) {
+						transform.opacity(self.$back, (1 - value));
+						transform.opacity(self.$left, (1 - value));
+						transform.opacity(self.$right, (1 - value));
+						transform.opacity(self.$center, (1 - value));
+					});
+
+					return Animation.animate(NAV_ANIMATION_DURATION, 1, 0, function(value) {
+						var x = (value) * -100;
+						var x2 = (value) * -w;
+
+						transform.translate(self.$left, x + "%");
+						transform.translate(self.$center, x2 + "px");
+					});
+				}
+			}
+		});
+	</script>
+</web-component>

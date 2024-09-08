@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-save</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="tablet" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="source" transform="translate(-3.000000, -326.000000)">
+            <g id="icon-save" transform="translate(0.000000, 322.000000)">
+                <polygon id="Bounds" points="0 0 24 0 24 24 0 24"></polygon>
+                <path d="M17,4 L5,4 C3.89,4 3,4.9 3,6 L3,20 C3,21.1 3.89,22 5,22 L19,22 C20.1,22 21,21.1 21,20 L21,8 L17,4 L17,4 Z M12,20 C10.34,20 9,18.66 9,17 C9,15.34 10.34,14 12,14 C13.66,14 15,15.34 15,17 C15,18.66 13.66,20 12,20 L12,20 Z M15,10 L5,10 L5,6 L15,6 L15,10 L15,10 Z" id="Icon" fill="#000000"></path>
+            </g>
+        </g>
+    </g>
+</svg>

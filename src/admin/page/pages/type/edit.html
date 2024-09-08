@@ -1,0 +1,629 @@
+{% extends "layout/blogs" %}
+
+{% block content %}
+{% raw %}
+<style>
+	iframe {
+		width: 100%;
+		height: auto;
+	}
+</style>
+
+<template id="toolbar">
+	<ui-btn-group>
+		<ui-btn strong type="simple" (click)="저장하기()">
+			<svg-icon src="icon-save"></svg-icon>
+			<span>SAVE</span>
+		</ui-btn>
+		
+		<div class="toolbar-divider"></div>
+		
+		<ui-btn type="simple" (click)="태그하기()">
+			<svg-icon src="btn-tag"></svg-icon>
+			<span>TAG</span>
+		</ui-btn>
+		
+		<div class="toolbar-divider"></div>
+		
+		<ui-btn type="simple" (click)="이미지올리기()">
+			<svg-icon src="btn-img"></svg-icon>
+			<span>IMG</span>
+		</ui-btn>
+		<!--<ui-btn type="simple" (click)="갤러리()">-->
+			<!--<svg-icon src="btn-gallery"></svg-icon>-->
+			<!--<span>GALLERY</span>-->
+		<!--</ui-btn>-->
+		<!--<ui-btn type="simple" (click)="영상올리기()">-->
+			<!--<svg-icon src="btn-video"></svg-icon>-->
+			<!--<span>VIDEO</span>-->
+		<!--</ui-btn>-->
+		<ui-btn type="simple" (click)="링크걸기()">
+			<svg-icon src="btn-link"></svg-icon>
+			<span>LINK</span>
+		</ui-btn>
+		
+		<div class="toolbar-divider"></div>
+		
+		<ui-btn type="simple" (click)="커버이미지숨기기()">
+			<svg-icon src="btn-thumbnail"></svg-icon>
+			<span>COVER-IMG</span>
+		</ui-btn>
+		
+		<div class="toolbar-divider"></div>
+		
+		<!--<ui-btn hbox>-->
+			<!--<input type="color" placeholder="#xxx" style="width: 22px; height: 20px; border: 1px solid #000" [(value)]="blog.title_color">-->
+			<!--<space size="8"></space>-->
+			<!--<div>TITLE-COLOR</div>-->
+		<!--</ui-btn>-->
+		<!---->
+		<!--<div class="toolbar-divider"></div>-->
+		
+		<div>
+			<input type="date" placeholder="날짜를 입력하세요." style="border: 1px dashed #ccc; padding: 8px" [(value)]="blog.published_at">
+		</div>
+		
+		
+		<space flex></space>
+		
+		<div class="toolbar-divider"></div>
+		
+		<ui-btn type="simple" (click)="모드변경('desktop')">
+			<svg-icon src="btn-desktop"></svg-icon>
+		</ui-btn>
+		<ui-btn type="simple" (click)="모드변경('mobile')">
+			<svg-icon src="btn-mobile"></svg-icon>
+		</ui-btn>
+	</ui-btn-group>
+</template>
+
+
+<template id="content">
+	<section hbox="start" style="height: 100%" [visible]="$editor && blog">
+		<div flex style="height: 100%;">
+			<div style="height: 100%;">
+				<iframe src="/admin/editor" frameborder="none" (load)="onLoadEditor(event)" style="height: 100%"></iframe>
+			</div>
+		</div>
+		
+		<aside edit-aside blog>
+			<h1>TEXT STYLE</h1>
+			<section edit-aside-menu>
+				<div (click)="서식적용('h1')"><a type="h1">제목</a></div>
+				<div (click)="서식제거()">본문</div>
+				<div (click)="서식적용('strong')"><a type="strong">강조1</a></div>
+				<div (click)="서식적용('em')"><a type="em">강조2</a></div>
+				<!--<div (click)="링크걸기()"><a href>링크</a></div>-->
+			</section>
+		</aside>
+	</section>
+</template>
+
+
+<template id="태그편집">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>Tags</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+	
+	<section popup-content-wrap style="width: 600px">
+		
+		<ui-form>
+			<ui-fields>
+				<h1>TAGS</h1>
+				<div hbox="wrap">
+					<label *repeat="params.tags as tag" style="display: block; margin: 5px">
+						<input type="checkbox" [value]="tag" [(checked)]="params.tags"/> {{ tag }}
+					</label>
+					
+					<highlight>{{ params.custom_tags }}</highlight>
+				</div>
+				
+				<!--<div>-->
+				<!--<highlight>#{{ params.tags | join:' #' }} {{ params.custom_tags }}</highlight>-->
+				<!--</div>-->
+				
+				<space size="32"></space>
+				
+				<h1>카테고리</h1>
+				<div>
+					<div hbox="wrap">
+						<label *repeat="categories as tag" style="display: block; margin: 5px">
+							<input type="checkbox" [value]="tag" [(checked)]="params.tags"/> {{ tag }}
+						</label>
+					</div>
+					
+					<space size="16"></space>
+				</div>
+				
+				<h1>태그</h1>
+				<div hbox="wrap">
+					<label *repeat="tags as tag" style="display: block; margin: 5px">
+						<input type="checkbox" [value]="tag" [(checked)]="params.tags"/> {{ tag }}
+					</label>
+				</div>
+				
+				<space size="16"></space>
+				
+				<h1>커스텀 태그</h1>
+				<ui-field>
+					<input type="text" flex [(value)]="params.custom_tags" placeholder="#태그를 입력하세요."/>
+				</ui-field>
+			</ui-fields>
+		
+		</ui-form>
+	</section>
+	
+	<footer>
+		<ui-btn type="simple" (click)="태그저장하기()" icon="save">SAVE</ui-btn>
+	</footer>
+</template>
+
+
+<template id="썸네일편집">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>썸네일</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+	
+	<section popup-content-wrap>
+		<ui-form>
+			<ui-fields>
+				<ui-field>
+					<h1>썸네일</h1>
+					<ui-image-upload hbox flex [(value)]="blog.thumbnail"></ui-image-upload>
+				</ui-field>
+			</ui-fields>
+		</ui-form>
+	</section>
+	
+	<footer>
+		<ui-btn type="simple" (click)="팝업닫기(blog.thumbnail)" icon="save">SAVE</ui-btn>
+	</footer>
+</template>
+
+
+<template id="링크걸기팝업">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>LINK</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+	
+	<section popup-content-wrap>
+		<form ui-form (submit)="링크적용(params.url)">
+			<ui-fields>
+				<ui-field>
+					<h1>URL</h1>
+					<input flex type="text" [(value)]="params.url" placeholder="http://example.com" autofocus/>
+				</ui-field>
+			</ui-fields>
+		</form>
+	</section>
+	
+	<footer>
+		<ui-btn type="simple" (click)="링크적용(params.url)" icon="save">SAVE</ui-btn>
+	</footer>
+</template>
+
+
+<template id="비디오팝업">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>VIDEO</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+	
+	<section popup-content-wrap>
+		<form ui-form (submit)="비디오적용하기(params.html)">
+			<ui-fields>
+				<ui-field>
+					<h1>code</h1>
+					<input flex [(value)]="params.html" placeholder="code here." autofocus></input>
+				</ui-field>
+			</ui-fields>
+		</form>
+	</section>
+	
+	<footer>
+		<ui-btn type="simple" (click)="비디오적용하기(params.html)" icon="save">SAVE</ui-btn>
+	</footer>
+</template>
+
+
+<template id="갤러리팝업">
+	<header>
+		<div flex></div>
+		<i icon="edit"></i>
+		<h1>갤러리</h1>
+		<div flex></div>
+		<ui-btn type="icon" class="btn-close" (click)="팝업닫기()"><i icon="close"></i></ui-btn>
+	</header>
+	
+	<section popup-content-wrap>
+		<ui-form>
+			<ui-fields>
+				<ui-multi-image-field [(value)]="params.images">
+				</ui-multi-image-field>
+			</ui-fields>
+		</ui-form>
+	</section>
+	
+	<footer>
+		<ui-btn type="simple" (click)="갤러리적용하기(params.images)" icon="save">SAVE</ui-btn>
+	</footer>
+</template>
+
+
+{% endraw %}
+{% endblock %}
+
+
+{% block script %}
+<script>module.component("viewController", function(self, url, http, $localStorageObject) {
+
+	function upgrade(html) {
+		var div = document.createElement("div");
+
+		div.innerHTML = html;
+
+		Array.from(div.querySelectorAll("a")).forEach(function(a) {
+			var href = a.getAttribute("href");
+
+			switch (href) {
+				case "h1":
+				case "strong":
+				case "em":
+				case "h1-en":
+				case "strong-en":
+				case "em-en":
+					a.setAttribute("type", href.replace("-en", ""));
+					a.removeAttribute("href");
+					break;
+			}
+		});
+
+		return div.innerHTML;
+	}
+
+	return {
+		init: function() {
+			self.type = url.parse()[2];
+			switch (self.type) {
+				case "grafik-people":
+					self.type = "grafik:people:2000";
+					break;
+
+				case "hot-issue":
+					self.type = "hot issue";
+					break;
+			}
+
+			self.store = window.CONFIG;
+			self.categories = self.store.categories;
+
+			self.mode = "desktop";
+
+			self.blog_config = $localStorageObject("blog-config");
+			self.tags = self.blog_config.tags;
+
+			///
+			self.$watch(["$gp", "blog"], function() {
+				if (self.$gp && self.blog) {
+					self.$gp.blog = self.blog;
+					self.$gp.mode = self.mode;
+				}
+			});
+
+
+			/// 블로그 불러오기
+			self.id = location.hash.slice(1);
+			if (self.id) {
+				http.GET("/admin/api/blogs", self.id).then(function(res) {
+					self.blog = res;
+					self.blog.published_at = self.blog.published_at || Date.format("yyyy-mm-dd", new Date());
+
+					if (self.blog.version !== "v2.0") {
+						self.blog.body = upgrade(self.blog.body);
+					}
+				});
+			}
+
+			/// 블로그 초기화
+			else {
+				self.blog = {};
+				self.blog.name = "제목없음";
+				self.blog.hasCover = true;
+				self.blog.body = "";
+				self.blog.type = self.type;
+				self.blog.published_at = Date.format("yyyy-mm-dd", new Date());
+
+				if (self.type !== "blog") {
+					self.blog.tags = [self.type];
+				}
+			}
+
+			/// 태그
+			return self.새로고침();
+		},
+
+		onLoadEditor: function(event) {
+			var iframe = event.target;
+			self.$editor = iframe.contentWindow.blog;
+			self.$gp = iframe.contentWindow.$gp;
+
+
+			self.$editor.editor.addEventListener("keydown", function(e) {
+				if (e.metaKey || e.ctrlKey) {
+					switch (e.key) {
+						case "1":
+							e.preventDefault();
+							self.서식적용("h1");
+							break;
+
+						case "2":
+							e.preventDefault();
+							self.서식제거();
+							break;
+
+						case "b":
+							e.preventDefault();
+							self.서식적용("strong");
+							break;
+
+						case "u":
+							e.preventDefault();
+							self.서식적용("em");
+							break;
+
+						case "i":
+							e.preventDefault();
+							self.이미지올리기();
+							break;
+
+						case "k":
+							e.preventDefault();
+							self.링크걸기();
+							break;
+
+						case "s":
+							e.preventDefault();
+							self.저장하기();
+							break;
+
+//						case "Escape":
+//							e.preventDefault();
+//							self.insertHTML("<iframe is='iframe-widget' scrolling='no' height='0'></iframe>");
+//							break;
+					}
+				}
+			});
+
+
+			self.$editor.editor.addEventListener("click", function(e) {
+
+				var el = e.target.closest("img,iframe,a");
+				if (!el) return;
+
+				switch (el.tagName) {
+					case "A":
+						var href = e.target.getAttribute("href");
+						if (href) {
+							self.$editor.selectNode(e.target);
+							self.링크걸기(href);
+						}
+						return;
+
+					case "IFRAME":
+						self.$editor.selectNode(el);
+						switch (el.getAttribute("name")) {
+							case "gp-post-gallery":
+								var data = JSON.parse(el.getAttribute("data") || "");
+								self.갤러리(data);
+								break;
+
+							case "gp-post-iframe":
+								self.$editor.selectNode(el);
+								break;
+								
+						}
+						return;
+
+					case "IMG":
+						self.$editor.selectNode(el);
+						return;
+				}
+			});
+		},
+
+		"창닫기": function() {
+			window.close();
+		},
+
+		"새로고침": function() {
+			http.GET("/admin/api/tags").then(function(res) {
+				self.blog_config.tags = self.tags = res;
+				self.blog_config.save();
+			});
+		},
+
+		"팝업닫기": function() {
+			self.popup = null;
+		},
+
+		"저장하기": function() {
+			showLoading();
+
+			self.id = location.hash.slice(1);
+
+			var promise = [];
+
+			Array.from(self.$editor.editor.querySelectorAll("img")).forEach(function(img) {
+				if (img.src.slice(0, 5) === "data:") {
+					promise.push(http.fileUpload(img).then(function(res) {
+						img.src = res.src;
+						img.width = res.width;
+						img.height = res.height;
+						return res;
+					}));
+				}
+			});
+
+			Array.from(self.$editor.editor.querySelectorAll("iframe[name='gp-post-gallery']")).forEach(function(iframe) {
+				iframe.data.slice().forEach(function(img, index) {
+					if (img.src.slice(0, 5) === "data:") {
+						promise.push(http.fileUpload(img).then(function(res) {
+							iframe.data[index] = res;
+							iframe.setAttribute("data", JSON.stringify(iframe.data));
+							return res;
+
+						}).catch(function(e) {
+							throw  e;
+						}));
+					}
+				});
+			});
+
+
+			return Promise.all(promise).then(function(imgs) {
+				var blog = Object.assign({}, self.blog);
+
+				blog.body = self.$editor.getHTML();
+				blog.imgs = imgs;
+				blog.custom_tags = "";
+				blog.version = "v2.0";
+
+				return (self.id ? http.PUT("/admin/api/blogs", self.id, blog) : http.POST("/admin/api/blogs", blog)).then(function(res) {
+					return http.GET("/admin/api/blogs", res.id).then(function(res) {
+						self.blog.cover = res.cover;
+						location.replace("#" + res.id);
+						alert("저장하였습니다.");
+						hideLoading();
+						
+						return self.새로고침();
+					});
+				});
+			});
+		},
+
+		"태그하기": function() {
+			self.params = {};
+			self.params.tags = self.blog.tags || [];
+			self.params.custom_tags = "";
+			self.popup = "태그편집";
+		},
+
+		"태그저장하기": function() {
+			var marks = {};
+			var tags = self.params.custom_tags.split("#").map(function(x) { return x.trim(); });
+			self.blog.tags = self.params.tags.concat(tags).filter(function(x) {
+				if (!x) return false;
+				if (marks[x]) return false;
+				marks[x] = true;
+				return true;
+			});
+
+			self.blog.custom_tags = self.params.custom_tags;
+			self.팝업닫기();
+		},
+
+		"썸네일업로드하기": function() {
+			self.popup = "썸네일편집";
+		},
+
+		"커버이미지숨기기": function() {
+			self.blog.hasCover = !self.blog.hasCover;
+		},
+
+		"모드변경": function(mode) {
+			self.mode = mode;
+			self.$gp.mode = mode;
+		},
+
+
+		/// 에디터 연동
+		"이미지올리기": function() {
+			self.$editor.uploadImage();
+		},
+
+		"갤러리": function(images) {
+			self.params = {};
+			self.params.images = images || [];
+			self.popup = "갤러리팝업";
+		},
+
+		"갤러리적용하기": function(images) {
+			self.팝업닫기();
+			self.$editor.insertWidget("gp-post-gallery", images);
+		},
+
+		"영상올리기": function() {
+			self.params = {};
+			self.params.html = "";
+			self.popup = "비디오팝업";
+		},
+
+		"비디오적용하기": function(html) {
+			self.팝업닫기();
+			self.$editor.insertWidget("gp-post-iframe", html);
+		},
+
+		"링크걸기": function(href) {
+			if (href) {
+				self.params = {};
+				self.params.url = href;
+				self.popup = "링크걸기팝업";
+				return;
+			}
+
+			var sel = self.$editor.getSelection();
+			var node = sel.focusNode.parentNode;
+
+			if (node.tagName === "A" && node.getAttribute("href")) {
+				if (sel.type !== "Range") {
+					var range = sel.getRangeAt(0);
+					range.selectNode(node);
+				}
+
+				self.params = {};
+				self.params.url = node.getAttribute("href");
+				self.popup = "링크걸기팝업";
+				return;
+			}
+
+			self.params = {};
+			self.params.url = "";
+			self.popup = "링크걸기팝업";
+		},
+
+		"링크적용": function(url) {
+			if (url.slice(0, 7) !== "http://" && url.slice(0, 8) !== "https://") {
+				url = "http://" + url;
+			}
+
+			self.$editor.createLink(url);
+			self.팝업닫기();
+		},
+
+		"서식적용": function(style) {
+			self.$editor.applyStyle(style);
+		},
+
+		"서식제거": function() {
+			self.$editor.removeStyle();
+		}
+	}
+});
+
+</script>
+{% endblock %}

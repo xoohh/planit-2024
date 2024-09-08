@@ -1,0 +1,85 @@
+{% extends "layout/base" %}
+
+{% block body %}
+<template is="dom-bind" link="rootViewController">
+	<nav id="menubar" [attr.class]="isNavShow ? 'show' : 'hide'">
+		<a href="/admin/videos">
+			<div>videos</div>
+		</a>
+
+		<a href="/admin/tags">
+			<div>tags</div>
+		</a>
+
+		<a href="/admin/pages/blog">
+			<div>blog</div>
+		</a>
+
+		<a href="/admin/users">
+			<div>admin</div>
+		</a>
+	</nav>
+
+	<section id="title">
+		<ui-btn type="icon" (click)="네비토글()"><i icon="menu"></i></ui-btn>
+		<h1><a href="/" target="_blank">{{ config.title }}</a></h1>
+		<h2>1px administration system</h2>
+		<div flex></div>
+		<div class="account">{{ account.email | e}}</div>
+		<ui-btn type="inline" (click)="로그아웃()">LOGOUT</ui-btn>
+	</section>
+</template>
+
+
+<template is="dom-bind" link="viewController">
+	<section id="toolbar" hbox>
+		<div sidebar class="menu-title" *template="'titlebar'"></div>
+		<div class="menu-actions" *template="'toolbar'"></div>
+	</section>
+
+	<section flex hbox="start" style="position: relative;">
+		<div sidebar relative style="height:100%;">
+			<div layer class="nav">
+				<div *template="'sidebar'"></div>
+			</div>
+		</div>
+		<div flex *template="'content'" style="height:100%; overflow-y: scroll">></div>
+
+		<div class="copyright">
+			<img src="/admin/img/copyright-1px.svg" width="70" height="10"/>
+		</div>
+	</section>
+
+	<ui-popup *if="popup" [delegate]="this">
+		<div *template="popup"></div>
+	</ui-popup>
+</template>
+
+
+{% block content %}{% endblock %}
+
+{% endblock %}
+
+
+{% block head %}
+<script>app.component("rootViewController", function(self) {
+	return {
+		init: function() {
+			self.isNavShow = false;
+		},
+
+		"네비토글": function() {
+			self.isNavShow = !self.isNavShow;
+		},
+
+		"로그아웃": function() {
+			http.DELETE("/api/account").then(function() {
+				location.replace("/admin");
+			})
+		}
+
+	}
+})</script>
+{% endblock %}
+
+

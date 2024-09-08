@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>icon-close</title>
+    <desc>Created with Sketch.</desc>
+    <g id="mobile" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="player" transform="translate(-327.000000, -24.000000)">
+            <g id="icon-close" transform="translate(327.000000, 24.000000)">
+                <polygon id="Bounds" points="0 0 24 0 24 24 0 24"></polygon>
+                <polygon id="Icon" fill="#EEEEEE" points="24 2.41714286 21.5828571 0 12 9.58285714 2.41714286 0 0 2.41714286 9.58285714 12 0 21.5828571 2.41714286 24 12 14.4171429 21.5828571 24 24 21.5828571 14.4171429 12"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

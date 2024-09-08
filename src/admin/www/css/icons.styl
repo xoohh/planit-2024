@@ -1,0 +1,247 @@
+@import core
+@import colors
+
+// 상품상태 아이콘
+span.status
+  display inline-block
+  min-width 69px
+  font-size 12px
+  padding 1px 12px
+  border-radius 12px
+  border 1px solid $border
+  text-align center
+
+span
+  &.작성중
+  &.거래완료
+  &.cancelled
+  &.확인완료
+    color $status-finish
+    border-color $status-finish
+
+  &.비공개
+  &.배송요청
+    color $status-dimmed
+    border-color $status-dimmed
+
+  &.공개
+  &.답변완료
+  &.배송완료
+  &.승인완료
+  &.승인됨
+  &.VERIFIED
+  &.paid
+    color $status-primary
+    border-color $status-primary
+
+  &.작성중
+  &.배송중
+  &.정산요청
+    color $status-accent
+    border-color $status-accent
+
+  &.취소완료
+  &.승인거절
+  &.UNVERIFIED
+    color $status-warn
+    border-color $status-warn
+
+  &.접수완료
+    color $status-accent2
+    border-color $status-accent2
+
+  &.주문완료
+    color $status-accent3
+    border-color $status-accent3
+
+
+// 이미지 아이콘
+i[icon]
+  display block
+
+  &[icon="menu"]
+    width 18px
+    height 12px
+    background-image url('/admin/img/icon-menu.svg')
+    background-size 18px 12px
+    background-repeat no-repeat
+
+  &[icon="add"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-add.svg')
+    background-size 14px 14px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="remove"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-remove.svg')
+    background-size 14px 2px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="checkbox"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-checkbox.svg')
+    background-size 18px 18px
+    background-repeat no-repeat
+    background-position center center
+
+    [selected] &
+      width 24px
+      height 24px
+      background-image url('/admin/img/icon-checkbox-selected.svg')
+      background-size 18px 18px
+      background-repeat no-repeat
+      background-position center center
+
+  &[icon="back"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-back.svg')
+    background-size 7.4px 12px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="next"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-next.svg')
+    background-size 7.4px 12px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="search"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-search.svg')
+    background-size 17.5px 17.5px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="save"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-save.svg')
+    background-size 18px 18px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="edit"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-edit.svg')
+    background-size 18px 18px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="close"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-close.svg')
+    background-size 14px 14px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="close-white"]
+    width 24px
+    height 24px
+    background-image url('/admin/img/icon-close-white.svg')
+    background-size 14px 14px
+    background-repeat no-repeat
+    background-position center center
+
+  &[icon="order"]
+    width 18px
+    height 22px
+    background-image url('/img/icon-order.svg')
+    background-size 18px 22px
+    background-repeat no-repeat
+
+
+  // ----blog
+  &[icon="save"]
+    width 18px
+    height 18px
+    background-image url('/admin/img/icon-save.svg')
+    background-size 18px 18px
+    background-repeat no-repeat
+
+  &[icon="tag"]
+    width 20px
+    height 20px
+    background-image url('/admin/img/btn-tag.svg')
+    background-size 20px 20px
+    background-repeat no-repeat
+
+  &[icon="thumbnail"]
+    width 18px
+    height 18px
+    background-image url('/admin/img/btn-thumbnail.svg')
+    background-size 18px 18px
+    background-repeat no-repeat
+
+  &[icon="img"]
+    width 18px
+    height 18px
+    background-image url('/admin/img/btn-img.svg')
+    background-size 18px 18px
+    background-repeat no-repeat
+
+  &[icon="gallery"]
+    width 16px
+    height 16px
+    background-image url('/admin/img/btn-gallery.svg')
+    background-size 16px 16px
+    background-repeat no-repeat
+
+  &[icon="video"]
+    width 20px
+    height 20px
+    background-image url('/admin/img/btn-video.svg')
+    background-size 20px 20px
+    background-repeat no-repeat
+
+  &[icon="link"]
+    width 20px
+    height 10px
+    background-image url('/admin/img/btn-link.svg')
+    background-size 20px 10px
+    background-repeat no-repeat
+
+  &[icon="desktop"]
+    width 23px
+    height 20px
+    background-image url('/admin/img/btn-desktop.svg')
+    background-size 23px 20px
+    background-repeat no-repeat
+
+  &[icon="mobile"]
+    width 14px
+    height 22px
+    background-image url('/admin/img/btn-mobile.svg')
+    background-size 14px 22px
+    background-repeat no-repeat
+
+
+svg-icon
+  display flex
+  > *
+    margin auto
+
+  &[src="icon-menu"]
+    width 18px
+    height 12px
+
+  &[src="icon-add"]
+  &[src="icon-remove"]
+  &[src="icon-back"]
+  &[src="icon-next"]
+  &[src="icon-save"]
+  &[src="icon-order"]
+    width 24px
+    height 24px
+

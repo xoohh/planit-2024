@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>{{ config.title }}</title>
+
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="initial-scale=1, width=device-width, minimum-scale=0.1, user-scalable=no"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<link rel="shortcut icon" href="/favicon.ico">
+	
+	{% block css %}
+	<link rel="stylesheet" type="text/css" href="/css/base.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/core.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/prototype.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/blog.css"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/admin.css?v=5"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/icons.css?v=1"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/btns.css"/>
+	<link rel="stylesheet" type="text/css" href="/admin/css/blog.css"/>
+	{% endblock %}
+
+	<script src="/admin/js/polyfill.min.js"></script>
+	<script src="/admin/js/ie_polyfill.js"></script>
+
+	<script src="/admin/js/fetch.js"></script>
+	<script src="/admin/js/1px.util.js"></script>
+	<script src="/admin/js/1px.custom-element.js"></script>
+	<script src="/admin/js/1px.module.js"></script>
+	<script src="/admin/js/1px.watch.js"></script>
+	<script src="/admin/js/1px.expression.js"></script>
+	<script src="/admin/js/1px.compile.js"></script>
+	<script src="/admin/js/1px.component.js"></script>
+	<script src="/admin/js/1px.core.js"></script>
+	<script src="/admin/js/1px.touch.js"></script>
+	<script src="/admin/js/1px.animation.js"></script>
+	<script src="/admin/js/1px.http.js"></script>
+	<script src="/admin/js/1px.upload.js"></script>
+	<script src="/admin/js/1px.jquery.js"></script>
+	<script src="/admin/js/1px.sticky-position.js"></script>
+	
+	<script src="/admin/js/config.js"></script>
+	
+	{% set components = scandir("components") %}
+	{% for path in components -%}
+	<link rel="import" href="/admin/components{{path}}"/>
+	{% endfor %}
+
+	<script src="/admin/js/1px.html-import.js"></script>
+	<!--<script src="/js/script.js"></script>-->
+
+	{%- block head %}{% endblock -%}
+
+	{% block script %}{% endblock %}
+</head>
+<body vbox>
+{% block template %}{% endblock %}
+{% block body %}{% endblock %}
+
+
+
+
+
+<div id="loading"></div>
+<script>
+	function showLoading() {
+		showLoading.index++;
+		console.log("showLoading()", showLoading.index);
+		document.getElementById("loading").style.display = "block";
+	}
+
+	function hideLoading() {
+		showLoading.index--;
+		console.log("hideLoading()", showLoading.index);
+		if (showLoading.index <= 0) {
+			document.getElementById("loading").style.display = "none";
+		}
+	}
+
+	showLoading.index = 0;
+</script>
+
+
+</body>
+</html>

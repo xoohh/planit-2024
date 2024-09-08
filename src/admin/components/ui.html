@@ -1,0 +1,225 @@
+<web-component name="ui-btn">
+	<template>
+		<svg-icon [attr.src]="'icon-' + icon" *if="icon"></svg-icon>
+		<div>
+			<content></content>
+		</div>
+	</template>
+	<script>app.component("ui-btn", function(self) {
+		return {
+			init: function() {
+				self.icon = self.getAttribute("icon");
+			}
+		}
+	});
+	</script>
+</web-component>
+
+
+<web-component name="ui-search">
+	<template>
+		<form (submit)="submit(event)">
+			<section searchbar>
+				<i icon="search"></i>
+				<input type="text" placeholder="" [(value)]="value"/>
+			</section>
+		</form>
+	</template>
+	<script>app.component("ui-search", function(self) {
+		return {
+			submit: function(event) {
+				self.dispatchEvent(new CustomEvent(event.type, event));
+			}
+		}
+	});
+	</script>
+</web-component>
+
+
+<web-component name="ui-image-upload">
+	<template>
+		<ui-image-upload-preview flex style="height: 55px;" [style.background-image.url]="value.src" $bg></ui-image-upload-preview>
+		
+		<ui-btn type="inline">
+			<image-upload [(value)]="value">
+				<ui-btn>UPLOAD</ui-btn>
+			</image-upload>
+		</ui-btn>
+	</template>
+	<script>app.component("ui-image-upload", function(self) {
+		return {
+			init: function() {
+				self.$watch("value", function() {
+					self.dispatchEvent(new CustomEvent("input"));
+				});
+			}
+		}
+	});
+	</script>
+
+</web-component>
+
+
+<web-component name="ui-image-multi-upload">
+	<template>
+		<div>
+			<div style="width: 55px; height: 55px;" cover [style.background-image.url]="value.src"></div>
+		</div>
+		
+		<div flex></div>
+		
+		<ui-btn type="inline">
+			<image-upload [(value)]="value">
+				<ui-btn>UPLOAD</ui-btn>
+			</image-upload>
+		</ui-btn>
+	</template>
+	<script>app.component("ui-image-multi-upload", function(self) {
+		return {
+			init: function() {
+				self.$watch("value", function() {
+					self.dispatchEvent(new CustomEvent("input"));
+				})
+			}
+		}
+	});
+	</script>
+</web-component>
+
+
+<web-component name="ui-multi-image-field">
+	<template>
+		<content select="h1"></content>
+		
+		<ui-fields>
+			<ui-field *repeat="value as v, index">
+				<h1>IMG {{ index+1 }}</h1>
+				<ui-image-upload-preview flex [style.background-image.url]="v.src"></ui-image-upload-preview>
+				<ui-btn type="inline" (click)="위로(index)">UP</ui-btn>
+				<ui-btn type="inline" (click)="아래로(index)">DOWN</ui-btn>
+				<ui-btn type="inline" (click)="삭제(index)">DELETE</ui-btn>
+			</ui-field>
+			
+			<ui-field>
+				<h1></h1>
+				<div flex></div>
+				
+				<ui-btn type="inline">
+					<image-multi-upload [(value)]="value">
+						<ui-btn>UPLOAD</ui-btn>
+					</image-multi-upload>
+				</ui-btn>
+			</ui-field>
+		</ui-fields>
+	</template>
+	
+	<script>app.component("ui-multi-image-field", function(self) {
+		return {
+			init: function() {
+				self.$watch("value", function() {
+					self.dispatchEvent(new CustomEvent("input"));
+				})
+			},
+
+			"위로": function(index) {
+				if (index <= 0) return;
+				var a = self.value.splice(index, 1);
+				self.value.splice.apply(self.value, [index - 1, 0].concat(a));
+				self.value = self.value.slice();
+			},
+
+			"아래로": function(index) {
+				var a = self.value.splice(index, 1);
+				self.value.splice.apply(self.value, [index + 1, 0].concat(a));
+				self.value = self.value.slice();
+			},
+
+			"삭제": function(index) {
+				self.value.splice(index, 1);
+				self.value = self.value.slice();
+			}
+		}
+	});</script>
+</web-component>
+
+
+
+
+<web-component name="ui-multi-image-link-field">
+	<template>
+		<content select="h1"></content>
+		
+		<ui-fields>
+			<ui-field *repeat="value as v, index">
+				<h1>IMG {{ index+1 }}</h1>
+				<div style="width: 55px; height: 55px;" cover [style.background-image.url]="v.src"></div>
+				<space size="16"></space>
+				<div>
+					<input type="text" [(value)]="v.link" placeholder="링크를 입력하세요."/>
+				</div>
+				<space size="16"></space>
+				<div>
+					<input type="text" [(value)]="v.background_color" placeholder="배경색(hex)"/>
+				</div>
+				<div style="margin: 8px 0; width:44px; height:44px; outline: 1px solid #000" [style.background-color]="'#'+v.background_color"></div>
+				
+				<div flex></div>
+				<ui-btn type="inline" (click)="위로(index)">UP</ui-btn>
+				<ui-btn type="inline" (click)="아래로(index)">DOWN</ui-btn>
+				<ui-btn type="inline" (click)="삭제(index)">DELETE</ui-btn>
+			</ui-field>
+			
+			<ui-field>
+				<h1></h1>
+				<div flex></div>
+				
+				<ui-btn type="inline">
+					<image-multi-upload [(value)]="value">
+						<ui-btn>UPLOAD</ui-btn>
+					</image-multi-upload>
+				</ui-btn>
+			</ui-field>
+		</ui-fields>
+	</template>
+	
+	<script>app.component("ui-multi-image-link-field", function(self) {
+		return {
+			init: function() {
+				self.$watch("value", function() {
+					self.dispatchEvent(new CustomEvent("input"));
+				})
+			},
+
+			"위로": function(index) {
+				if (index <= 0) return;
+				var a = self.value.splice(index, 1);
+				self.value.splice.apply(self.value, [index - 1, 0].concat(a));
+				self.value = self.value.slice();
+			},
+
+			"아래로": function(index) {
+				var a = self.value.splice(index, 1);
+				self.value.splice.apply(self.value, [index + 1, 0].concat(a));
+				self.value = self.value.slice();
+			},
+
+			"삭제": function(index) {
+				self.value.splice(index, 1);
+				self.value = self.value.slice();
+			}
+		}
+	});</script>
+</web-component>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,106 @@
+<web-component name="ui-switch">
+	<template>
+		<ui-switch-inner>
+			<ui-switch-button *repeat="buttons as button, index" (click)="select(index)" [attr.selected]="selectedIndex === index">{{ button }}</ui-switch-button>
+		</ui-switch-inner>
+		<input type="hidden" [(value)]="value"/>
+	</template>
+
+	<script>
+		app.component("ui-switch", function(self) {
+			return {
+				init: function() {
+					self.$watch("value", function() {
+						self.selectedIndex = (self.values || self.buttons || []).indexOf(self.value);
+					});
+				},
+
+				select: function(index) {
+					self.selectedIndex = index;
+					self.value = (self.values || self.buttons || [])[index];
+					self.dispatchEvent(new CustomEvent("input"));
+					self.dispatchEvent(new CustomEvent("change"));
+				}
+			}
+		});
+	</script>
+</web-component>
+
+
+<web-component name="ui-checkbox-group">
+	<template><content></content></template>
+	<script>
+		app.component("ui-checkbox-group", function(self) {
+			return {
+				init: function() {
+					self.value = self.value || [];
+
+					self.$watch("value", function() {
+						if (!self.value) {
+							return;
+						}
+
+						if (!Array.isArray(self.value)) {
+							return;
+						}
+
+						foreach(self.querySelectorAll("input[type=checkbox]"), function(checkbox) {
+							checkbox.checked = self.value.indexOf(checkbox.value) >= 0;
+							checkbox.dispatchEvent(new CustomEvent("input"));
+						});
+					});
+
+					self.addEventListener("change", function() {
+						var result = [];
+						foreach(self.querySelectorAll("input[type=checkbox]"), function(checkbox) {
+							if (checkbox.checked) {
+								result.push(checkbox.value);
+							}
+						});
+
+						self.value = result;
+						self.dispatchEvent(new CustomEvent("input"));
+
+					}, true);
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+<web-component name="ui-checkbox">
+	<template [attr.checked]="checked">
+		<label>
+			<input type="checkbox" [value]="value" style="position: absolute; opacity: 0;width:0; height:0" $checkbox/>
+			<content></content>
+		</label>
+	</template>
+	<script>
+		app.component("ui-checkbox", function(self) {
+			return {
+				init: function() {
+					self.trueValue = self.getAttribute("value") || true;
+
+					self.$checkbox.addEventListener("input", function() {
+						self.checked = self.$checkbox.checked;
+						self.value = self.checked ? self.trueValue : false;
+						self.dispatchEvent(new CustomEvent("input"));
+					});
+
+					self.$checkbox.addEventListener("change", function() {
+						self.checked = self.$checkbox.checked;
+						self.value = self.checked ? self.trueValue : false;
+						self.dispatchEvent(new CustomEvent("input"));
+					});
+
+					self.$watch("value", function() {
+						self.$checkbox.checked = (self.trueValue == self.value);
+						self.$checkbox.dispatchEvent(new CustomEvent("input"));
+					});
+				}
+			}
+		})
+	</script>
+</web-component>
+

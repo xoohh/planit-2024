@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="22px" viewBox="0 0 18 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-order</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="tablet" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="shop-cart-2" transform="translate(-648.000000, -733.000000)" fill="#000000">
+            <g id="contents" transform="translate(262.000000, 218.000000)">
+                <g id="btn-order" transform="translate(152.000000, 502.000000)">
+                    <path d="M250,15 L245.82,15 C245.4,13.84 244.3,13 243,13 C241.7,13 240.6,13.84 240.18,15 L236,15 C234.9,15 234,15.9 234,17 L234,33 C234,34.1 234.9,35 236,35 L250,35 C251.1,35 252,34.1 252,33 L252,17 C252,15.9 251.1,15 250,15 L250,15 Z M243,15 C243.55,15 244,15.45 244,16 C244,16.55 243.55,17 243,17 C242.45,17 242,16.55 242,16 C242,15.45 242.45,15 243,15 L243,15 Z M250,33 L236,33 L236,17 L238,17 L238,20 L248,20 L248,17 L250,17 L250,33 L250,33 Z" id="icon-order"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

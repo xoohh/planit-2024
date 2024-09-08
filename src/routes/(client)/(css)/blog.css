@@ -1,0 +1,50 @@
+[color="accent"] {
+  color: #009be0;
+}
+[blog] {
+  font-family: "Futura-MediumItalic", "Apple SD Gothic Neo", "Helvetica Neue", 'dotum', sans-serif;
+  font-weight: 400;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-wrap;
+}
+[blog] img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+[blog] > iframe,
+[blog] > gp-post-gallery {
+  display: block;
+  width: 100%;
+  margin: 21px 0;
+}
+[blog] > iframe[data-source],
+[blog] > gp-post-gallery {
+  padding: 0 32px;
+}
+[blog] a[href] {
+  color: #009be0;
+  text-decoration: underline;
+}
+[blog] a[type] {
+  cursor: inherit !important;
+}
+[blog] h1,
+[blog] a[type="h1"] {
+  display: inline;
+  color: #000;
+  text-decoration: inherit;
+  font-size: 22px;
+}
+[blog] strong,
+[blog] a[type="strong"] {
+  color: #000;
+  text-decoration: inherit;
+  font-weight: bold;
+}
+[blog] em,
+[blog] a[type="em"] {
+  color: inherit;
+  text-decoration: underline;
+}

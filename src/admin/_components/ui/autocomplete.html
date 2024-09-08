@@ -1,0 +1,112 @@
+<web-component name="auto-complete" extends="input">
+	<template></template>
+	<script>
+		app.component("auto-complete", function(self, http) {
+			return {
+				init: function() {
+
+				}
+			}
+		})
+	</script>
+</web-component>
+
+
+<web-component name="ui-autocomplete">
+	<template>
+		<input type="text" $input [(value)]="value">
+		<ui-autocomplete-list *if="rows.length">
+			<div *repeat="rows as row" [inner-html]="row.html" (click)="select(row.value)"></div>
+		</ui-autocomplete-list>
+	</template>
+
+	<script>
+		app.component("ui-autocomplete", function(self) {
+
+
+			function format(fmt, scope) {
+
+				var scripts = [];
+				$interpolate(fmt, function(text, isExpr, isLast) {
+					if (isExpr) {
+						var script = text.slice(2, -2);
+						scripts.push(script);
+					}
+					else {
+						scripts.push('"' + text.replace(/"/g, '\\"') + '"');
+					}
+				});
+				scripts = scripts.join("+");
+
+				return $parse(scripts)(scope);
+			}
+
+			return {
+				init: function() {
+					self.rows = [];
+
+					self.$input.oninput = function() {
+						var value = self.$input.value.toLowerCase();
+						if (value === "") {
+							self.rows = [];
+							return;
+						}
+
+						self.list = self.list || [];
+
+						self.rows = [];
+						foreach(self.list, function(row) {
+
+							var value2 = row[self.prop];
+
+							if (self.format) {
+								row = format(self.format, row);
+							}
+
+							if (!row) {
+								return;
+							}
+
+							var index = row.toLowerCase().search(value);
+							if (index === -1) {
+								return;
+							}
+
+							var html = row.slice(0, index) + "\uffff";
+							html += row.substr(index, value.length) + "\uffff";
+							html += row.slice(index + value.length);
+
+							html = html.replace(/[&<>]/g, function(a) {
+								switch (a) {
+									case '&':
+										return "&amp;";
+									case '<':
+										return "&lt;";
+									case '>':
+										return "&gt;";
+								}
+								return "";
+							});
+
+							var num = -1;
+							html = html.replace(/[\uffff]/g, function(a) {
+								num++;
+								return num % 2 === 0 ? "<strong>" : "</strong>";
+							});
+
+							self.rows.push({html: html, value: value2});
+						});
+
+						self.dispatchEvent(new CustomEvent("input"));
+					}
+				},
+
+				select: function(value) {
+					self.$input.value = value;
+					self.$input.dispatchEvent(new Event("input"));
+					self.rows = [];
+				}
+			}
+		});
+	</script>
+</web-component>

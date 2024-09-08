@@ -1,0 +1,919 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+@import core
+@import colors
+
+$desktop = 640px
+$tablet = 768px
+$mobile = 375px
+$content-width = 1024px
+
+[hidden]:not([animation])
+  display none !important
+
+[flex]
+  flex 1
+
+[\\\(click\\\)]
+[\\\(click|stop\)]
+  cursor pointer
+
+
+html
+  max-width 100%
+  height 100%
+  background #000
+
+body
+  vbox()
+  height 100%
+  color $general-font-color
+  font-size 16px
+  font-family "Futura-MediumItalic", "Apple SD Gothic Neo", "Helvetica Neue", 'dotum', sans-serif
+  -webkit-text-size-adjust none
+  word-break keep-all
+
+main
+  flex()
+  width 100%
+  margin auto
+
+img
+  display block
+
+
+inner()
+  padding-left 32px
+  padding-right 32px
+
+[inner]
+  inner()
+
+inset()
+  padding 16px 32px
+
+[inset]
+  inset()
+
+a
+  &:hover
+  &:active
+    cursor pointer
+
+[text-link]
+  color $accent
+  font-weight bold
+  font-style italic
+  text-decoration underline
+
+// ---- 해상도 구분 ----
+[dt-only]
+  +mobile()
+    display none
+
+[m-only]
+  +tablet-and-desktop()
+    display none
+
+// ---- 공통으로 사용하는 레이아웃 ----
+header
+  layer()
+  position fixed
+  bottom auto
+  width 100%
+  z-index 7000
+  height 74px
+
+  &[accent]
+    [nav-header]
+      > a
+        &:hover
+        &:active
+          color inherit
+
+  > [bg]
+    layer();
+    background $accent
+
+  > [wrap]
+    position relative
+    margin 0 auto
+    padding 24px
+    hbox()
+
+  [logo]
+    flex()
+
+    > a
+      display block
+      width 95px
+      height 32px
+      background url('/img/logo-planit.svg') no-repeat center center
+      background-size 100% 100%
+
+  [nav-header]
+    > a
+      color $general-font-color
+
+      &:hover
+      &:active
+        color $accent
+
+      +tablet-and-desktop()
+        margin-left 24px
+
+      +mobile()
+        margin-left 16px
+
+
+footer
+  layer()
+  position fixed
+  top auto
+  z-index 10000
+
+  +tablet-and-desktop()
+    display none
+
+  [nav-footer]
+    background $accent
+    height 56px
+    hbox()
+
+    &::before
+    &::after
+      content ''
+      display block
+      flex()
+
+    > a
+      color $general-font-color
+      margin 0 12px
+
+  //&:hover
+  //&:active
+  //  color $accent
+
+  div.copyright
+    display block
+    height 40px
+    font-size 12px
+    background $bk22
+    hbox()
+
+    > div
+      flex()
+      text-align center
+
+// --- fixed 된 헤더때문에 추가 ---
+space[size-header]
+  display block
+  width 100%
+  height 74px
+
+
+[title-bar]
+  height 50px
+  color $accent
+  background $white
+  text-align center
+  hbox()
+
+  +desktop()
+    font-size 20px
+  +mobile()
+    font-size 16px
+
+  [title]
+    flex()
+
+[title-bar="dark"]
+  color $white
+  background $black
+
+[title-bar="stress"]
+  color $white
+  background $stress
+
+
+// ---- 팝업 메뉴 ----
+// ---- 0. 팝업공통 ---
+[popup]
+  position fixed
+  width 100%
+  height 100%
+  background rgba(0, 0, 0, 0.8)
+  z-index 5000
+
+// ---- 1. 메뉴팝업( NOTE : WORKS 전용인지 확인해야함) ---
+[nav-popup]
+  overflow scroll
+  font-size 24px
+  padding-top 16px + 74px
+  padding-bottom 16px
+
+  > a
+    display block
+    height 34px
+    margin-top 6px
+    margin-bottom 2px
+
+    > div
+      padding 0 40px
+
+    &:hover
+    &:active
+      color $black
+      background $white
+
+// ---- 2. CONTACT 팝업 ---
+[contact-popup]
+  padding-top 74px
+  overflow auto
+
+  [contact-desc]
+
+    +desktop()
+      width $content-width
+
+    padding-top 18px
+    padding-left 24px
+    padding-right 24px
+    padding-bottom 35px
+    font-size 16px
+    line-height 24px
+
+
+  [initial-contact-content]
+    [contact-desc]
+      margin 0 auto
+
+  [contact-grid-content]
+    width 100%
+
+    [title-bar]
+      > [wrap]
+        width $content-width
+        margin 0 auto
+        hbox()
+
+    [contact-desc-wrap]
+
+      +desktop()
+        width $content-width
+        hbox(start)
+        margin 0 auto
+
+      +tablet()
+        width 100%
+        hbox(start)
+        margin 0 auto
+
+      > [contact-desc]
+        flex()
+
+// ---- 3. PLAYER 팝업 ( NOTE: 현재 페이지로 구성되어 있음 ) ---
+[player-popup]
+  position relative
+  width 100%
+  height 100%
+  color $white
+  background $black
+  z-index 7000
+  hbox()
+
+  //&:before
+  //  content ""
+  //  layer()
+  //  background #000 url("../img/loading.gif") no-repeat center center
+  //  background-size auto 8px
+  //
+
+  [player-media]
+    z-index 1
+    layer()
+
+    iframe
+      layer()
+      width 100%
+      height 100%
+
+  [player-title]
+    position absolute
+    z-index 2
+    top 24px
+    left 24px
+
+    h1
+      font-size 32px
+
+    h2
+      font-size 24px
+
+  [player-btn]
+    position absolute
+    padding 12px
+    z-index 10
+
+    > div
+      width 24px
+      height 24px
+
+    &[player-btn='close']
+      top 24px
+      right 24px
+      background url('/img/icon-close.svg') no-repeat center center
+
+
+    &[player-btn='play']
+    &[state="played"]
+      left 24px
+      bottom 24px
+      background url('/img/icon-pause.svg') no-repeat center center
+
+    &[player-btn='pause']
+    &[state="paused"]
+      left 24px
+      bottom 24px
+      background url('/img/icon-play.svg') no-repeat center center
+
+    &[player-btn='full-screen']
+      right 24px
+      bottom 24px
+      background url('/img/icon-fullscreen.svg') no-repeat center center
+
+
+  [player-slider]
+    display flex
+    position absolute
+    left 80px
+    right 80px
+    bottom 24px
+    height 48px
+    z-index 10
+
+    [player-slider-bar]
+      position relative
+      width 100%
+      height 2px
+      background $white
+      margin auto 0
+
+    [player-slider-active]
+      width 0
+      height 100%
+      background $accent
+      transition width 0.3s linear
+
+
+[animation-desc]
+  z-index 10
+
+  h1
+    opacity 0
+
+    &.animation
+      animation fade-in 1s both
+
+  h2
+    opacity 0
+
+    &.animation
+      animation fade-in 1s both
+
+
+// ---- 전체화면 배너 ----
+[full-screen-banner]
+  [banner-desc]
+    position absolute
+    width 100%
+    left 0
+    line-height 60px
+
+    +tablet-and-desktop()
+      bottom 175px
+
+    +mobile()
+      bottom 164px
+
+    > [wrap]
+      margin 0 auto
+      padding 0 24px
+
+    h1
+      font-size 64px
+
+    h2
+      font-size 40px
+
+  // ---- 배너 인디케이터 ----
+
+  [banner-indicators]
+    position absolute
+    width 100%
+    left 0
+    bottom 24px
+    hbox()
+
+    &::before
+    &::after
+      content ''
+      display block
+      flex()
+
+    > [wrap]
+      hbox()
+      width 100%
+      padding 0 24px
+
+      > [indicator]
+        width 15px
+        height 14px
+        margin-left -5px
+        margin-bottom -5px
+        padding 12px
+        background url('/img/indigator-1.svg') no-repeat center center
+        background-size 15px 14px
+
+        &[on]
+          background url('/img/indigator-2.svg') no-repeat center center
+          background-size 15px 14px
+
+        &:hover
+          cursor pointer
+
+        +mobile()
+          width 30px
+          height 28px
+          margin-right 10px
+          background-size 30px 28px
+
+          &[on]
+            background-size 30px 28px
+
+  // --- 배너 진행 슬라이더 ( progress slider ? )
+
+  [banner-indicators-bar]
+    position absolute
+    width 100%
+    height 2px
+    bottom 0
+    background $white
+    hbox()
+
+    > div
+      flex()
+      height 100%
+
+      &[on]
+        background $accent
+
+
+section.work-contents
+  height 100%
+  vbox()
+
+// ---- 그리드 컨텐츠 ( 데스크탑에서 그리드 정렬되는 컨텐츠) ----
+[title-content]
+  position fixed
+  top 74px
+  right 24px
+  z-index 1000
+
+  h1
+    font-size 16px
+    line-height 34px
+
+// --- 1. 첫번째 그리드 컨텐츠 ( full-width )
+[initial-content]
+  position relative
+  width 100%
+  background-size cover
+  background #000
+  ratio(16, 9)
+
+  +mobile()
+    ratio(1, 1)
+    iframe
+      width 180%
+      height 100%
+      border 0
+      margin -1px
+
+
+  [initial-content-desc]
+    position absolute
+    width 100%
+    left 0
+    bottom 0
+    z-index 100
+
+    > [wrap]
+      margin 0 auto
+
+    +mobile()
+      z-index 100
+
+    > [wrap]
+      margin 0 auto
+
+      +tablet-and-desktop()
+        padding 54px 24px
+
+      +mobile()
+        padding 24px
+
+    h1
+      +tablet-and-desktop()
+        font-size 60px
+
+      +mobile()
+        font-size 32px
+
+    h2
+      +tablet-and-desktop()
+        font-size 40px
+
+      +mobile()
+        font-size 24px
+
+// --- 2. 그 외 ( 2단 )
+[grid-works-content]
+  +desktop()
+    display grid
+    grid-template-columns: 1fr 1fr 1fr
+    grid-auto-flow: row dense
+
+  +tablet()
+    display grid
+    grid-template-columns: 1fr 1fr
+    grid-auto-flow: row dense
+
+  [works-cell]
+    ratio(16, 9)
+    flex()
+    position relative
+    background #000
+
+    [works-cell-desc]
+      position absolute
+      left 24px
+      bottom 24px
+      line-height 36px
+
+      +tablet-and-destkop()
+        z-index 1
+
+      +mobile()
+        z-index 100
+
+      h1
+        font-size 32px
+
+      h2
+        font-size 24px
+
+[video-space]
+  display block
+  text-align center
+  padding 1rem
+  hbox()
+
+  > *
+    margin auto
+
+  p
+    color #999999
+    font-size 11px
+    padding-top 180px
+
+  +tablet-and-desktop()
+    display none
+
+
+[grid-blog-content]
+  background #fff
+  +tablet-and-desktop()
+    display grid
+    grid-template-columns: 1fr 1fr
+    grid-auto-flow: row dense
+
+  [wrap]
+    flex()
+
+  [post]
+    background #fff
+
+    [post-img]
+      img
+        display block
+        width 100%
+
+    [post-desc]
+      white-space pre-wrap
+      color $bk33
+      padding-top 13px
+      padding-bottom 27px
+
+      > p
+        padding-left 24px
+        padding-right 24px
+
+
+section.video-background-list
+  layer()
+  display block
+
+  [banner-wrap]
+    layer()
+    background rgba(0, 0, 0, 0);
+
+  .track
+    layer()
+    top auto
+    height 2px
+    background #fff
+
+    .progress
+      layer()
+      right auto
+      width 0
+      background $blue
+      transition width 0.3s linear
+
+
+video-background
+  layer()
+  display block
+  overflow hidden
+
+  &:before
+    content ""
+    layer()
+    background #000 url("../img/loading.gif") no-repeat center center
+    background-size auto 8px
+
+  > iframe
+    width: 100vw;
+    height: 56.25vw; /* Given a 16:9 aspect ratio, 9/16*100 = 56.25 */
+    min-height: 100vh;
+    min-width: 177.77vh; /* Given a 16:9 aspect ratio, 16/9*100 = 177.77 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+
+video-background-thumbnail
+  layer()
+  display block
+  overflow hidden
+  cursor pointer
+
+  [animation-desc]
+    display none
+
+  [thumbnail]
+    layer()
+    background-size cover
+    background-position center center
+    transition opacity 0.38s
+    z-index 1
+
+  div[loading]
+    content ""
+    layer()
+    background url("../img/loading.gif") no-repeat center center
+    background-size auto 8px
+    z-index 100
+    display none
+
+  &[will-state="played"]
+    div[loading]
+      display block
+
+  &[state="played"]
+    div[loading]
+      display none
+
+    [animation-desc]
+      display block
+
+    [thumbnail]
+      opacity 0
+
+
+  &[state="played"][will-state="paused"]
+    div[thumbnail]
+      opacity 1
+
+
+  &:after
+    content ""
+    layer()
+    background rgba(0, 0, 0, 0)
+    z-index 1
+
+  > iframe
+    layer()
+    width 100%
+    height 177.7777%
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border 0
+    margin -1px
+
+
+video-player
+[video-player]
+  layer()
+  position fixed
+  display block
+  overflow hidden
+  z-index 9999
+
+  [layer]
+    layer()
+    background rgba(0, 0, 0, 0)
+    z-index 1
+
+section.logo
+  layer()
+  background: url(/img/logo-planit.svg) no-repeat center center
+
+
+[animation=fade]
+  transition opacity 0.62s
+  opacity 1
+
+  &[hidden]
+    transition opacity 0.38s
+    opacity 0
+    pointer-events none
+
+
+.fade-enter-active
+  transition opacity 0.62s
+
+  &.fade-enter
+    opacity 0
+    pointer-events none
+
+  &.fade-enter-to
+    opacity 1
+
+
+.fade-leave-active
+  transition opacity 0.38s
+
+  &.fade-leave
+    opacity 1
+
+  &.fade-leave-to
+    opacity 0
+    pointer-events none
+
+
+@keyframes fade-in
+  from
+    opacity 0
+
+  to
+    opacity 1
+
+
+// ---- ABOUT ----
+[about-content]
+  [about-wrap]
+
+    +desktop()
+      width $content-width
+      margin 0 auto
+      hbox(start)
+
+  [about-desc]
+
+    +desktop()
+      flex()
+
+    padding-top 18px
+    padding-left 24px
+    padding-right 24px
+    padding-bottom 35px
+    font-size 16px
+    line-height 24px
+    text-align justify
+
+
+[award-content]
+  [award-list]
+    +desktop()
+      width $content-width
+      margin 0 auto
+    //hbox()
+
+    +tablet()
+      width $tablet
+      margin 0 auto
+      margin-top 30px
+
+    +mobile()
+      width $mobile
+      margin 0 auto
+      margin-top 30px
+
+    [award]
+      position relative
+      //flex()
+      float left
+      hbox()
+
+      +desktop()
+        width 260px
+        height 180px
+        margin 20px 40px
+
+      +tablet()
+        width 50%
+        height 100px
+        padding 20px 40px
+
+      +mobile()
+        width 100%
+        height 100px
+        padding 20px 40px
+
+      [aw-logo]
+        width 40%
+        height 100%
+
+      &[award='1'] [aw-logo]
+        background url('/img/aw_1.png') no-repeat center center
+        background-size contain
+
+      &[award='2'] [aw-logo]
+        background url('/img/aw_2.png') no-repeat center center
+        background-size contain
+
+      &[award='3'] [aw-logo]
+        background url('/img/aw_3.png') no-repeat center center
+        background-size contain
+
+      &[award='4'] [aw-logo]
+        background url('/img/aw_4.png') no-repeat center center
+        background-size contain
+
+      &[award='5'] [aw-logo]
+        background url('/img/aw_5.png') no-repeat center center
+        background-size contain
+
+      &[award='6'] [aw-logo]
+        background url('/img/aw_6.png') no-repeat center center
+        background-size contain
+
+      &[award='7'] [aw-logo]
+        background url('/img/aw_7.png') no-repeat center center
+        background-size contain
+
+      &[award='8'] [aw-logo]
+        background url('/img/aw_8.png') no-repeat center center
+        background-size contain
+
+      &[award='9'] [aw-logo]
+        background url('/img/aw_9.png') no-repeat center center
+        background-size contain
+
+      h1
+        //position absolute
+        //right -50px
+        //bottom -10px
+        flex()
+        text-align right
+
+        +desktop()
+          font-size 44px
+
+        +tablet()
+          font-size 33px
+
+        +mobile()
+          font-size 22px
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

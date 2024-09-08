@@ -1,0 +1,2 @@
+{#% extends "layout/index" %#}
+{% extends "layout/" + ("index" if account.type == '관리자' else "login") %}

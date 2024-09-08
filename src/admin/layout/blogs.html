@@ -1,0 +1,29 @@
+{% extends "layout/base" %}
+
+{% block body %}
+<template is="dom-bind" link="viewController">
+	<section id="title" bg-color="dark">
+		<ui-btn type="icon" (click)="창닫기()"><i icon="close-white"></i></ui-btn>
+		<h1><a href="/" target="_blank">Blog-KIT</a></h1>
+		<h2>1px administration system</h2>
+		<div flex></div>
+	</section>
+	
+	<section id="toolbar" hbox>
+		<div class="menu-actions" *template="'toolbar'"></div>
+	</section>
+	
+	<section flex hbox="start">
+		<div flex *template="'content'" style="height:100%; overflow-y: scroll;">></div>
+	</section>
+	
+	<ui-popup *if="popup" [delegate]="this">
+		<div *template="popup"></div>
+	</ui-popup>
+	
+	<div id="loading"></div>
+</template>
+{% block content %}{% endblock %}
+
+{% endblock %}
+
